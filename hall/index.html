@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cambria', serif;
+            background: linear-gradient(135deg, #0c0f1d 0%, #1a1f3a 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 星空背景效果 */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 标题样式 */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #a8c0ff, #3f2b96);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #c0c0ff;
+        }
+        
+        /* 中央文本区域 */
+        .center-box {
+            background: rgba(20, 25, 50, 0.7);
+            border: 1px solid rgba(100, 120, 220, 0.4);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: float 6s ease-in-out infinite;
+            max-width: 80%;
+        }
+        
+        .center-box h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            font-weight: normal;
+        }
+        
+        .center-box p {
+            font-size: 1.2rem;
+            color: #b0b0ff;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* 导航区域 */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 2rem;
+        }
+        
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        
+        /* 图标样式 */
+        .nav-icon {
+            width: 130px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .nav-icon:hover {
+            transform: scale(1.15);
+        }
+        
+        /* 自习室图标 */
+        .study-icon {
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            box-shadow: 0 0 25px rgba(52, 152, 219, 0.6);
+        }
+        
+        /* 英语中心图标 */
+        .english-icon {
+            background: linear-gradient(135deg, #e74c3c, #e67e22);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6);
+        }
+        
+        /* 返回图标 */
+        .back-icon {
+            background: linear-gradient(135deg, #2ecc71, #1abc9c);
+            box-shadow: 0 0 25px rgba(46, 204, 113, 0.6);
+        }
+        
+        /* 图标内部图形 */
+        .icon-content {
+            font-size: 3.5rem;
+            color: white;
+        }
+        
+        /* 标签样式 */
+        .nav-label {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #e0e0ff;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 底部装饰 */
+        .footer {
+            position: absolute;
+            bottom: 2rem;
+            width: 100%;
+            text-align: center;
+            color: #9090c0;
+            font-size: 1rem;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-section {
+                width: 80%;
+                margin-bottom: 2rem;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .center-box h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Library Navigation Center</h1>
+            <p>Discover our specialized sections designed to enhance your learning experience</p>
+        </div>
+        
+        <div class="center-box">
+            <h2>Hmm? Is there no one here?</h2>
+            <p>This space is quiet and peaceful, perfect for focused learning. Choose your destination below to continue your journey.</p>
+        </div>
+        
+        <div class="navigation">
+            <!-- 左侧自习室导航 -->
+            <div class="nav-section">
+                <a href="https://amber2713.github.io/sitetwo/selfstudy/" class="nav-icon study-icon">
+                    <div class="icon-content">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                </a>
+                <div class="nav-label">Self-Study Room</div>
+                <p>Quiet space for individual learning</p>
+            </div>
+            
+            <!-- 右侧英语中心导航 -->
+            <div class="nav-section">
+                <a href="https://amber2713.github.io/sitetwo/English/" class="nav-icon english-icon">
+                    <div class="icon-content">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                </a>
+                <div class="nav-label">English Learning Center</div>
+                <p>Resources for mastering English</p>
+            </div>
+            
+            <!-- 左下角返回导航 -->
+            <div class="nav-section">
+                <a href="https://amber2713.github.io/sitetwo/library" class="nav-icon back-icon">
+                    <div class="icon-content">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                </a>
+                <div class="nav-label">Back to Library</div>
+                <p>Return to main library area</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Library Navigation System © 2023 | Designed for Optimal Learning Experience</p>
+    </div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置和大小
+                const size = Math.random() * 3;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // 随机动画时长
+                star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 页面加载时创建星星
+        window.addEventListener('load', createStars);
+        
+        // 添加鼠标移动视差效果
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.querySelector('.container').style.transform = 
+                `translate(${x * 10 - 5}px, ${y * 10 - 5}px)`;
+        });
+    </script>
+</body>
+</html>
