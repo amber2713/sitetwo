@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                    },
+                    fontFamily: {
+                        cambria: ['Cambria', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .drop-shadow-2xl {
+                filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
+            }
+        }
+    </style>
+</head>
+<body class="font-cambria">
+    <div id="root"></div>
+
+    <script>
+        // 定义Lucide图标替代（使用Font Awesome）
+        const ArrowLeft = () => React.createElement("i", { className: "fa fa-arrow-left" });
+        const Mail = () => React.createElement("i", { className: "fa fa-envelope" });
+        const Coffee = () => React.createElement("i", { className: "fa fa-coffee" });
+        const X = () => React.createElement("i", { className: "fa fa-times" });
+
+        // 主应用组件
+        const App = () => {
+            const [dialogState, setDialogState] = React.useState('initial');
+            const [librarianState, setLibrarianState] = React.useState('visible');
+            const [showAssignment, setShowAssignment] = React.useState(false);
+            const [otherInput, setOtherInput] = React.useState('');
+            const [librarianMessage, setLibrarianMessage] = React.useState("What can I do for you?");
+            const [showIntroduction, setShowIntroduction] = React.useState(false);
+
+            const handleBackClick = () => {
+                window.location.href = 'https://chat.qwen.ai';
+            };
+
+            const handleMailClick = () => {
+                if (librarianState === 'hidden') {
+                    setLibrarianMessage("This email contains assignments submitted by students, and you are not allowed to look at them.");
+                    setLibrarianState('visible');
+                    setDialogState('initial');
+                } else if (librarianState === 'making-coffee') {
+                    setShowAssignment(true);
+                }
+            };
+
+            const handleOptionClick = (option) => {
+                switch (option) {
+                    case 'Nothing':
+                        setLibrarianState('hidden');
+                        setDialogState('hidden');
+                        break;
+                    case 'Introduction':
+                        setShowIntroduction(true);
+                        setDialogState('introduction');
+                        break;
+                    case 'Other':
+                        setDialogState('other-input');
+                        setOtherInput('');
+                        break;
+                }
+            };
+
+            const handleOtherSubmit = () => {
+                if (otherInput.toLowerCase().includes('coffee')) {
+                    setLibrarianState('making-coffee');
+                    setLibrarianMessage("Making coffee for you...");
+                    setDialogState('initial');
+                    setTimeout(() => {
+                        setLibrarianMessage("Here's your coffee. In fact, it's been so many years since anyone has been here that I can't even remember how long it's been. My database has suffered severe damage, and this is the only three things I can still do.");
+                    }, 2000);
+                } else {
+                    setLibrarianMessage("Sorry, I can't do it.");
+                    setDialogState('initial');
+                    setTimeout(() => {
+                        setLibrarianMessage("What can I do for you?");
+                    }, 2000);
+                }
+            };
+
+            const handleIntroductionComplete = () => {
+                setShowIntroduction(false);
+                setLibrarianMessage("What can I do for you?");
+                setDialogState('initial');
+            };
+
+            const closeAssignment = () => {
+                setShowAssignment(false);
+            };
+
+            return React.createElement(
+                "div",
+                {
+                    className: "min-h-screen relative overflow-hidden",
+                    style: {
+                        // 替换为实际背景图片
+                        backgroundImage: 'url(https://picsum.photos/id/24/1920/1080)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        fontFamily: 'Cambria, serif'
+                    }
+                },
+                // 后退按钮
+                React.createElement(
+                    "button",
+                    {
+                        onClick: handleBackClick,
+                        className: "absolute top-6 left-6 z-20 text-white hover:scale-125 transition-transform duration-300 bg-black bg-opacity-30 rounded-full p-3"
+                    },
+                    React.createElement(ArrowLeft, { size: 24 })
+                ),
+
+                // 咖啡图标
+                React.createElement(
+                    "div",
+                    { className: "absolute top-6 right-32 z-20" },
+                    React.createElement(Coffee, { size: 32, className: "text-amber-600 drop-shadow-lg" })
+                ),
+
+                // 邮件图标
+                React.createElement(
+                    "button",
+                    {
+                        onClick: handleMailClick,
+                        className: "absolute left-6 top-1/2 transform -translate-y-1/2 z-20 text-blue-600 hover:scale-110 transition-transform duration-300 bg-white bg-opacity-80 rounded-full p-3 shadow-lg"
+                    },
+                    React.createElement(Mail, { size: 28 })
+                ),
+
+                // 管理员图片
+                librarianState !== 'hidden' && React.createElement(
+                    "div",
+                    { className: "absolute right-8 bottom-0 z-10" },
+                    React.createElement("img", {
+                        // 替换为实际管理员图片
+                        src: "https://picsum.photos/id/1005/300/600",
+                        alt: "Librarian",
+                        className: "h-96 object-contain drop-shadow-2xl"
+                    })
+                ),
+
+                // 对话框
+                dialogState !== 'hidden' && React.createElement(
+                    "div",
+                    { className: "absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30" },
+                    React.createElement(
+                        "div",
+                        { className: "bg-white bg-opacity-95 rounded-2xl shadow-2xl p-6 max-w-md mx-4 border-2 border-blue-200" },
+                        dialogState === 'initial' && React.createElement(
+                            "div",
+                            { className: "text-center" },
+                            React.createElement(
+                                "p",
+                                { className: "text-lg text-gray-800 mb-4 font-medium" },
+                                librarianMessage
+                            ),
+                            librarianMessage === "What can I do for you?" && React.createElement(
+                                "div",
+                                { className: "space-y-2" },
+                                React.createElement(
+                                    "button",
+                                    {
+                                        onClick: () => handleOptionClick('Nothing'),
+                                        className: "block w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 text-gray-700"
+                                    },
+                                    "Nothing"
+                                ),
+                                React.createElement(
+                                    "button",
+                                    {
+                                        onClick: () => handleOptionClick('Introduction'),
+                                        className: "block w-full py-2 px-4 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors duration-200 text-blue-700"
+                                    },
+                                    "Introduction"
+                                ),
+                                React.createElement(
+                                    "button",
+                                    {
+                                        onClick: () => handleOptionClick('Other'),
+                                        className: "block w-full py-2 px-4 bg-green-100 hover:bg-green-200 rounded-lg transition-colors duration-200 text-green-700"
+                                    },
+                                    "Other"
+                                )
+                            )
+                        ),
+
+                        dialogState === 'introduction' && React.createElement(
+                            "div",
+                            { className: "text-center" },
+                            showIntroduction ? React.createElement(
+                                "div",
+                                null,
+                                React.createElement(
+                                    "p",
+                                    { className: "text-base text-gray-800 mb-4 leading-relaxed" },
+                                    "Welcome to our historic library! This magnificent institution was established in 1892 and has served as a beacon of knowledge for over a century. Our collection houses over 500,000 volumes, including rare manuscripts and first editions. The building itself is a masterpiece of Victorian architecture, featuring beautiful stained glass windows and ornate reading rooms that have inspired countless scholars and students throughout the years."
+                                ),
+                                React.createElement(
+                                    "button",
+                                    {
+                                        onClick: handleIntroductionComplete,
+                                        className: "py-2 px-6 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                                    },
+                                    "Continue"
+                                )
+                            ) : React.createElement(
+                                "p",
+                                { className: "text-lg text-gray-800" },
+                                "Loading introduction..."
+                            )
+                        ),
+
+                        dialogState === 'other-input' && React.createElement(
+                            "div",
+                            { className: "text-center" },
+                            React.createElement(
+                                "p",
+                                { className: "text-lg text-gray-800 mb-4" },
+                                "What would you like me to help you with?"
+                            ),
+                            React.createElement("input", {
+                                type: "text",
+                                value: otherInput,
+                                onChange: (e) => setOtherInput(e.target.value),
+                                className: "w-full p-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-blue-500 focus:outline-none",
+                                placeholder: "Type your request here...",
+                                autoFocus: true
+                            }),
+                            React.createElement(
+                                "button",
+                                {
+                                    onClick: handleOtherSubmit,
+                                    className: "py-2 px-6 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200"
+                                },
+                                "Submit"
+                            )
+                        )
+                    )
+                ),
+
+                // 作业模态框
+                showAssignment && React.createElement(
+                    "div",
+                    { className: "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" },
+                    React.createElement(
+                        "div",
+                        { className: "relative max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden" },
+                        React.createElement(
+                            "button",
+                            {
+                                onClick: closeAssignment,
+                                className: "absolute top-4 right-4 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-colors duration-200"
+                            },
+                            React.createElement(X, { size: 20 })
+                        ),
+                        React.createElement("img", {
+                            // 替换为实际作业图片
+                            src: "https://picsum.photos/id/20/800/600",
+                            alt: "Assignment",
+                            className: "w-full h-full object-contain"
+                        })
+                    )
+                )
+            );
+        };
+
+        // 渲染应用
+        ReactDOM.render(
+            React.createElement(App),
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
