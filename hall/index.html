@@ -22,43 +22,9 @@
             position: relative;
         }
         
-        /* 亮色遮罩层 */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            z-index: -1;
-        }
-        
-        /* 星空背景效果 */
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        .star {
-            position: absolute;
-            background-color: #6b7db3;
-            border-radius: 50%;
-            animation: twinkle var(--duration) infinite ease-in-out;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-        
         /* 主容器 */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
             min-height: 100vh;
@@ -93,11 +59,15 @@
             margin: 0 auto;
             line-height: 1.6;
             color: #555;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
         }
         
         /* 中央文本区域 */
         .center-box {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.85);
             border: 1px solid rgba(100, 120, 220, 0.3);
             border-radius: 15px;
             padding: 2.5rem;
@@ -129,7 +99,7 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 900px;
+            max-width: 1200px;
             margin-top: 2rem;
             position: relative;
         }
@@ -139,6 +109,27 @@
             flex-direction: column;
             align-items: center;
             width: 30%;
+        }
+        
+        /* 左侧导航 */
+        .left-nav {
+            position: absolute;
+            left: 5%;
+            top: 0;
+        }
+        
+        /* 右侧导航 */
+        .right-nav {
+            position: absolute;
+            right: 5%;
+            top: 0;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: absolute;
+            left: 5%;
+            bottom: -50%;
         }
         
         /* 图标样式 */
@@ -176,9 +167,6 @@
         .back-icon {
             background: linear-gradient(135deg, #2ecc71, #1abc9c);
             box-shadow: 0 0 25px rgba(46, 204, 113, 0.5);
-            position: absolute;
-            left: 0;
-            bottom: 0;
         }
         
         /* 图标内部图形 */
@@ -195,6 +183,10 @@
             color: #3f2b96;
             font-weight: bold;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
         }
         
         .nav-section p {
@@ -202,6 +194,10 @@
             margin-top: 0.5rem;
             color: #666;
             max-width: 180px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
         }
         
         /* 底部装饰 */
@@ -210,8 +206,15 @@
             bottom: 2rem;
             width: 100%;
             text-align: center;
-            color: #777;
+            color: #555;
             font-size: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem;
+            backdrop-filter: blur(5px);
+            max-width: 600px;
+            border-radius: 10px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         
         /* 动画效果 */
@@ -232,9 +235,13 @@
                 align-items: center;
             }
             
-            .nav-section {
-                width: 80%;
+            .left-nav, .right-nav, .bottom-nav {
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
                 margin-bottom: 2rem;
+                width: 100%;
             }
             
             .header h1 {
@@ -244,18 +251,10 @@
             .center-box h2 {
                 font-size: 2rem;
             }
-            
-            .back-icon {
-                position: relative;
-                margin-top: 2rem;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- 星空背景 -->
-    <div class="stars" id="stars"></div>
-    
     <div class="container">
         <div class="header">
             <h1>Library Navigation Center</h1>
@@ -269,7 +268,7 @@
         
         <div class="navigation">
             <!-- 左侧自习室导航 -->
-            <div class="nav-section">
+            <div class="nav-section left-nav">
                 <a href="https://amber2713.github.io/sitetwo/selfstudy/" class="nav-icon study-icon">
                     <div class="icon-content">
                         <i class="fas fa-book-open"></i>
@@ -280,7 +279,7 @@
             </div>
             
             <!-- 右侧英语中心导航 -->
-            <div class="nav-section">
+            <div class="nav-section right-nav">
                 <a href="https://amber2713.github.io/sitetwo/English/" class="nav-icon english-icon">
                     <div class="icon-content">
                         <i class="fas fa-globe-americas"></i>
@@ -291,7 +290,7 @@
             </div>
             
             <!-- 左下角返回导航 -->
-            <div class="nav-section">
+            <div class="nav-section bottom-nav">
                 <a href="https://amber2713.github.io/sitetwo/library" class="nav-icon back-icon">
                     <div class="icon-content">
                         <i class="fas fa-arrow-left"></i>
@@ -308,45 +307,13 @@
     </div>
 
     <script>
-        // 创建星空背景
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            const starsCount = 120;
-            
-            for (let i = 0; i < starsCount; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                // 随机位置和大小
-                const size = Math.random() * 3;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                
-                // 随机动画时长
-                star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
-                
-                starsContainer.appendChild(star);
-            }
-        }
-        
-        // 页面加载时创建星星
-        window.addEventListener('load', createStars);
-        
         // 添加鼠标移动视差效果
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
             
             document.querySelector('.container').style.transform = 
-                `translate(${x * 8 - 4}px, ${y * 8 - 4}px)`;
-                
-            // 星星也产生轻微的视差效果
-            document.querySelectorAll('.star').forEach(star => {
-                const speed = Math.random() * 3;
-                star.style.transform = `translate(${x * speed - speed/2}px, ${y * speed - speed/2}px)`;
-            });
+                `translate(${x * 5 - 2.5}px, ${y * 5 - 2.5}px)`;
         });
     </script>
 </body>
