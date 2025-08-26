@@ -16,13 +16,13 @@
             font-family: 'Cambria', serif;
             background: url('./images/hall.png') no-repeat center center fixed;
             background-size: cover;
-            color: #f0f0f0;
+            color: #333;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
         
-        /* 暗色遮罩层 */
+        /* 亮色遮罩层 */
         body::before {
             content: '';
             position: absolute;
@@ -30,7 +30,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 12, 23, 0.85);
+            background: rgba(255, 255, 255, 0.85);
             z-index: -1;
         }
         
@@ -46,14 +46,14 @@
         
         .star {
             position: absolute;
-            background-color: #fff;
+            background-color: #6b7db3;
             border-radius: 50%;
             animation: twinkle var(--duration) infinite ease-in-out;
         }
         
         @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
         }
         
         /* 主容器 */
@@ -80,8 +80,8 @@
         .header h1 {
             font-size: 3.5rem;
             margin-bottom: 1rem;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-            background: linear-gradient(to right, #a8c0ff, #3f2b96);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #3f2b96, #a8c0ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -92,19 +92,19 @@
             max-width: 600px;
             margin: 0 auto;
             line-height: 1.6;
-            color: #c0c0ff;
+            color: #555;
         }
         
         /* 中央文本区域 */
         .center-box {
-            background: rgba(20, 25, 50, 0.7);
-            border: 1px solid rgba(100, 120, 220, 0.4);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(100, 120, 220, 0.3);
             border-radius: 15px;
             padding: 2.5rem;
             margin: 3rem 0;
             text-align: center;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             animation: float 6s ease-in-out infinite;
             max-width: 80%;
         }
@@ -112,13 +112,13 @@
         .center-box h2 {
             font-size: 2.5rem;
             margin-bottom: 1rem;
-            color: #ffffff;
+            color: #3f2b96;
             font-weight: normal;
         }
         
         .center-box p {
             font-size: 1.2rem;
-            color: #b0b0ff;
+            color: #666;
             max-width: 500px;
             margin: 0 auto;
             line-height: 1.6;
@@ -163,19 +163,19 @@
         /* 自习室图标 */
         .study-icon {
             background: linear-gradient(135deg, #3498db, #8e44ad);
-            box-shadow: 0 0 25px rgba(52, 152, 219, 0.6);
+            box-shadow: 0 0 25px rgba(52, 152, 219, 0.5);
         }
         
         /* 英语中心图标 */
         .english-icon {
             background: linear-gradient(135deg, #e74c3c, #e67e22);
-            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.5);
         }
         
         /* 返回图标 */
         .back-icon {
             background: linear-gradient(135deg, #2ecc71, #1abc9c);
-            box-shadow: 0 0 25px rgba(46, 204, 113, 0.6);
+            box-shadow: 0 0 25px rgba(46, 204, 113, 0.5);
             position: absolute;
             left: 0;
             bottom: 0;
@@ -192,15 +192,15 @@
             font-size: 1.4rem;
             text-align: center;
             margin-top: 0.5rem;
-            color: #e0e0ff;
+            color: #3f2b96;
             font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .nav-section p {
             text-align: center;
             margin-top: 0.5rem;
-            color: #a0a0e0;
+            color: #666;
             max-width: 180px;
         }
         
@@ -210,7 +210,7 @@
             bottom: 2rem;
             width: 100%;
             text-align: center;
-            color: #9090c0;
+            color: #777;
             font-size: 1rem;
         }
         
@@ -311,7 +311,7 @@
         // 创建星空背景
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starsCount = 150;
+            const starsCount = 120;
             
             for (let i = 0; i < starsCount; i++) {
                 const star = document.createElement('div');
@@ -340,11 +340,11 @@
             const y = e.clientY / window.innerHeight;
             
             document.querySelector('.container').style.transform = 
-                `translate(${x * 10 - 5}px, ${y * 10 - 5}px)`;
+                `translate(${x * 8 - 4}px, ${y * 8 - 4}px)`;
                 
             // 星星也产生轻微的视差效果
             document.querySelectorAll('.star').forEach(star => {
-                const speed = Math.random() * 5;
+                const speed = Math.random() * 3;
                 star.style.transform = `translate(${x * speed - speed/2}px, ${y * speed - speed/2}px)`;
             });
         });
