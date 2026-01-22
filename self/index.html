@@ -21,20 +21,20 @@
             position: relative;
         }
         
-        /* 背景图片和遮罩 */
+        /* 背景图片：降低遮罩透明度以调高亮度 */
         .background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('images/selfstudy.png');
+            /* 调整：从 0.7/0.9 降至 0.4/0.6 */
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('images/selfstudy.png');
             background-size: cover;
             background-position: center;
             z-index: -2;
         }
         
-        /* 浮动白点容器 */
         .particles {
             position: fixed;
             top: 0;
@@ -44,7 +44,6 @@
             z-index: -1;
         }
         
-        /* 单个白点样式 */
         .particle {
             position: absolute;
             background-color: rgba(255, 255, 255, 0.7);
@@ -52,23 +51,13 @@
             animation: float 15s infinite ease-in-out;
         }
         
-        /* 白点浮动动画 */
         @keyframes float {
-            0%, 100% {
-                transform: translate(0, 0);
-            }
-            25% {
-                transform: translate(20px, 40px);
-            }
-            50% {
-                transform: translate(-30px, 70px);
-            }
-            75% {
-                transform: translate(10px, 30px);
-            }
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(20px, 40px); }
+            50% { transform: translate(-30px, 70px); }
+            75% { transform: translate(10px, 30px); }
         }
         
-        /* 主容器 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -81,79 +70,66 @@
             align-items: center;
         }
         
-        /* 标题样式 */
         .title {
             font-size: 4.5rem;
             margin-bottom: 3rem;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #fff,
-                0 0 20px #00b7ff,
-                0 0 35px #00b7ff,
-                0 0 40px #00b7ff;
+            text-shadow: 0 0 10px #fff, 0 0 20px #00b7ff;
             letter-spacing: 3px;
             position: relative;
-            padding-bottom: 1rem;
         }
         
-        .title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #ffffff, transparent);
-        }
-        
-        /* 锁图标容器 */
         .lock-container {
             margin: 2rem 0;
             padding: 1.5rem;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        
-        .lock-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+
+        /* 正在打印时的禁用样式 */
+        .lock-container.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
         }
         
-        /* 锁图标样式 */
         .lock-icon {
             width: 100px;
             height: 100px;
-            opacity: 0.3;
+            opacity: 0.8;
             transition: all 0.3s ease;
             margin: 0 auto;
         }
         
-        .lock-icon:hover {
-            opacity: 0.7;
-            transform: scale(1.2);
-        }
-        
-        /* 隐藏文本 */
         .hidden-text {
             max-width: 600px;
             margin: 2rem auto;
             padding: 2rem;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 1.2rem;
-            line-height: 1.6;
-            text-shadow: 0 0 3px #000, 0 0 5px #000;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 183, 255, 0.3);
+            font-size: 1.3rem;
+            line-height: 1.8;
+            min-height: 150px;
             display: none;
+            text-align: left;
+        }
+
+        /* 模拟打字机光标 */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background: #00b7ff;
+            margin-left: 5px;
+            vertical-align: middle;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
         }
         
-        /* 返回按钮 */
         .back-button {
             position: fixed;
             bottom: 30px;
@@ -165,109 +141,105 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            z-index: 100;
         }
-        
-        .back-button:hover {
-            transform: scale(1.2);
-            background: rgba(0, 0, 0, 0.7);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 3rem;
-            }
-            
-            .lock-icon {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .hidden-text {
-                font-size: 1rem;
-                padding: 1.5rem;
-            }
+
+        /* 打印时隐藏返回按钮以防跳转 */
+        .back-button.locked {
+            pointer-events: none;
+            opacity: 0.2;
         }
     </style>
 </head>
 <body>
-    <!-- 背景 -->
     <div class="background"></div>
-    
-    <!-- 浮动白点 -->
     <div class="particles" id="particles"></div>
     
-    <!-- 主内容 -->
     <div class="container">
         <h1 class="title">Study Room</h1>
         
-        <div class="lock-container">
-            <!-- 锁图标 -->
+        <div class="lock-container" id="lockBtn">
             <svg class="lock-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 16C12.8284 16 13.5 15.3284 13.5 14.5C13.5 13.6716 12.8284 13 12 13C11.1716 13 10.5 13.6716 10.5 14.5C10.5 15.3284 11.1716 16 12 16Z" fill="currentColor"/>
-                <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM12 17C10.9 17 10 16.1 10 15C10 13.9 10.9 13 12 13C13.1 13 14 13.9 14 15C14 16.1 13.1 17 12 17ZM15.1 8H8.9V6C8.9 4.29 10.29 2.9 12 2.9C13.71 2.9 15.1 4.29 15.1 6V8Z" fill="currentColor"/>
+                <path d="M12 16C12.8284 16 13.5 15.3284 13.5 14.5C13.5 13.6716 12.8284 13 12 13C11.1716 13 10.5 13.6716 10.5 14.5C10.5 15.3284 11.1716 16 12 16Z" fill="#00b7ff"/>
+                <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM15.1 8H8.9V6C8.9 4.29 10.29 2.9 12 2.9C13.71 2.9 15.1 4.29 15.1 6V8Z" fill="white"/>
             </svg>
         </div>
         
-        <!-- 隐藏文本 -->
         <div class="hidden-text" id="hiddenText">
-            Is it closed? I seem to remember there used to be a lot of people here. If you came late, there would be no seats, and it seems that some people would use books to occupy a seat for others.
+            <span id="textContent"></span><span class="cursor" id="cursor"></span>
         </div>
     </div>
     
-    <!-- 返回按钮 -->
-    <a href="https://amber2713.github.io/sitetwo/hall/" class="back-button">
+    <a href="https://amber2713.github.io/sitetwo/hall/" class="back-button" id="backBtn">
         <svg viewBox="0 0 24 24" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="white"/>
         </svg>
     </a>
 
     <script>
-        // 创建浮动白点
+        const sentences = [
+            "Is it closed?",
+            "I seem to remember there used to be a lot of people here.",
+            "If you came late, there would be no seats...",
+            "and it seems that some people would use books to occupy a seat for others."
+        ];
+
+        let isTyping = false;
+        const textContent = document.getElementById('textContent');
+        const hiddenTextDiv = document.getElementById('hiddenText');
+        const lockBtn = document.getElementById('lockBtn');
+        const backBtn = document.getElementById('backBtn');
+        const cursor = document.getElementById('cursor');
+
+        async function typeSentence(sentence) {
+            for (let i = 0; i < sentence.length; i++) {
+                textContent.innerHTML += sentence.charAt(i);
+                await new Promise(resolve => setTimeout(resolve, 50)); // 打字速度
+            }
+            textContent.innerHTML += "<br><br>"; // 句子间的换行
+            await new Promise(resolve => setTimeout(resolve, 600)); // 句子间的停顿
+        }
+
+        lockBtn.addEventListener('click', async function() {
+            if (isTyping) return; // 如果正在打印，点击无效
+
+            // 1. 初始化状态，隐藏返回按钮，禁用锁点击
+            isTyping = true;
+            lockBtn.classList.add('disabled');
+            backBtn.classList.add('locked');
+            textContent.innerHTML = ""; 
+            hiddenTextDiv.style.display = 'block';
+
+            // 2. 逐句播放
+            for (let sentence of sentences) {
+                await typeSentence(sentence);
+            }
+
+            // 3. 播放结束，解除锁定
+            isTyping = false;
+            lockBtn.classList.remove('disabled');
+            backBtn.classList.remove('locked');
+            cursor.style.display = 'none'; // 结束后光标消失
+        });
+
+        // 浮动粒子逻辑保持不变
         function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // 随机大小（2-5px）
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
                 const size = Math.random() * 3 + 2;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                // 随机位置
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                particle.style.left = `${posX}%`;
-                particle.style.top = `${posY}%`;
-                
-                // 随机动画延迟
-                particle.style.animationDelay = `${Math.random() * 5}s`;
-                
-                particlesContainer.appendChild(particle);
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(p);
             }
         }
-        
-        // 显示/隐藏文本
-        document.querySelector('.lock-container').addEventListener('click', function() {
-            const hiddenText = document.getElementById('hiddenText');
-            if (hiddenText.style.display === 'block') {
-                hiddenText.style.display = 'none';
-            } else {
-                hiddenText.style.display = 'block';
-            }
-        });
-        
-        // 页面加载时初始化
-        window.addEventListener('load', function() {
-            createParticles();
-        });
+
+        window.addEventListener('load', createParticles);
     </script>
 </body>
 </html>
