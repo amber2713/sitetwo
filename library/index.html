@@ -286,40 +286,83 @@
     </div>
 
     <script>
-        // 创建浮动白点
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // 随机大小
-                const size = Math.random() * 4 + 1;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                // 随机位置
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                
-                // 随机动画延迟
-                particle.style.animationDelay = `${Math.random() * 15}s`;
-                
-                particlesContainer.appendChild(particle);
-            }
+    const monologueText = `
+This red, perfectly symmetrical building feels strangely familiar.
+As if I have walked these halls countless times before.
+Yet no matter how hard I try, I cannot recall when.
+Perhaps the one who came here so often was never truly me...
+`.trim();
+
+    const typingSpeed = 50; // ms，每个字符（≈ 11 秒）
+
+    let index = 0;
+    const monologueEl = document.getElementById('monologue');
+    const exploreIcon = document.getElementById('exploreIcon');
+    const exploreText = document.getElementById('exploreText');
+
+    function lockUI(lock) {
+        document.body.classList.toggle('locked', lock);
+    }
+
+    function typeMonologue() {
+        if (index < monologueText.length) {
+            monologueEl.textContent += monologueText[index];
+            index++;
+            setTimeout(typeMonologue, typingSpeed);
+        } else {
+            // 独白结束
+            document.querySelector('.quote').classList.remove('cursor');
+            unlockAfterMonologue();
         }
-        
-        // 地图图标导航
-        function navigateToMap() {
-            window.location.href = 'https://amber2713.github.io/test/map/';
+    }
+
+    function unlockAfterMonologue() {
+        lockUI(false);
+
+        // 探索图标淡入
+        exploreIcon.style.display = 'flex';
+        exploreText.style.display = 'block';
+
+        exploreIcon.style.opacity = 0;
+        exploreText.style.opacity = 0;
+
+        setTimeout(() => {
+            exploreIcon.style.transition = 'opacity 1.5s ease';
+            exploreText.style.transition = 'opacity 1.5s ease';
+            exploreIcon.style.opacity = 1;
+            exploreText.style.opacity = 1;
+        }, 200);
+    }
+
+    // 创建浮动白点
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            const size = Math.random() * 4 + 1;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 15}s`;
+
+            particlesContainer.appendChild(particle);
         }
-        
-        // 初始化页面
-        window.onload = function() {
-            createParticles();
-        };
-    </script>
+    }
+
+    function navigateToMap() {
+        window.location.href = 'https://amber2713.github.io/test/map/';
+    }
+
+    window.onload = function () {
+        createParticles();
+        lockUI(true);      // 🔒 锁定所有点击
+        typeMonologue();   // ▶️ 播放独白
+    };
+</script>
 </body>
 </html>
