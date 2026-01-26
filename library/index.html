@@ -27,11 +27,7 @@
             flex-direction: column;
         }
 
-        /* 🔒 锁定状态的样式 */
-        body.locked {
-            pointer-events: none; /* 禁止所有点击交互 */
-            cursor: wait;
-        }
+        /* 移除原来的 body.locked 全局锁定 */
 
         .overlay {
             position: absolute;
@@ -72,6 +68,7 @@
             background: rgba(10, 15, 30, 0.5);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10; /* 确保在最上层 */
         }
 
         .title {
@@ -95,6 +92,12 @@
             border: 2px solid #d4b483;
             cursor: pointer;
             transition: all 0.3s ease;
+            pointer-events: auto; /* 显式允许点击 */
+        }
+
+        .map-icon:hover {
+            transform: scale(1.1);
+            background: rgba(214, 180, 115, 1);
         }
 
         .container {
@@ -116,7 +119,7 @@
             margin: 40px 0;
             border: 1px solid rgba(180, 150, 100, 0.5);
             width: 100%;
-            min-height: 250px; /* 预留高度防止抖动 */
+            min-height: 250px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -127,10 +130,9 @@
             line-height: 1.8;
             color: #e6d1a1;
             font-style: italic;
-            white-space: pre-wrap; /* 保持换行 */
+            white-space: pre-wrap;
         }
 
-        /* 模拟打字机光标 */
         .cursor::after {
             content: '|';
             animation: blink 1s infinite;
@@ -140,7 +142,7 @@
         @keyframes blink { 50% { opacity: 0; } }
 
         .explore-icon {
-            display: none; /* 初始隐藏 */
+            display: none; 
             align-items: center;
             justify-content: center;
             width: 100px;
@@ -156,7 +158,7 @@
         .explore-icon i { font-size: 45px; color: #2c1a0d; }
 
         .explore-text {
-            display: none; /* 初始隐藏 */
+            display: none;
             margin-top: 15px;
             font-size: 1.2rem;
             color: #d4b483;
@@ -171,7 +173,7 @@
         }
     </style>
 </head>
-<body class="locked"> <div class="overlay"></div>
+<body> <div class="overlay"></div>
     <div class="particles" id="particles"></div>
     
     <div class="navbar">
@@ -209,24 +211,19 @@ Perhaps the one who came here so often was never truly me...`;
     const exploreIcon = document.getElementById('exploreIcon');
     const exploreText = document.getElementById('exploreText');
 
-    // 1. 打字机逻辑
     function typeMonologue() {
         if (index < monologueText.length) {
             monologueEl.textContent += monologueText[index];
             index++;
             setTimeout(typeMonologue, typingSpeed);
         } else {
-            // 独白结束后执行
             monologueEl.parentElement.classList.remove('cursor');
-            unlockAfterMonologue();
+            showExploreButton(); // 文字播放完才显示底部的探索入口
         }
     }
 
-    // 2. 解锁逻辑
-    function unlockAfterMonologue() {
-        document.body.classList.remove('locked'); // 移除锁定类
-
-        // 显示探索按钮
+    // 只负责显示底部的“探索”按钮
+    function showExploreButton() {
         exploreIcon.style.display = 'flex';
         exploreText.style.display = 'block';
         exploreIcon.style.opacity = 0;
@@ -240,7 +237,6 @@ Perhaps the one who came here so often was never truly me...`;
         }, 100);
     }
 
-    // 3. 粒子效果
     function createParticles() {
         const container = document.getElementById('particles');
         for (let i = 0; i < 50; i++) {
@@ -256,13 +252,12 @@ Perhaps the one who came here so often was never truly me...`;
     }
 
     function navigateToMap() {
+        // 直接跳转，不打开新标签页
         window.location.href = 'https://amber2713.github.io/test/map/';
     }
 
-    // 4. 启动
     window.onload = function () {
         createParticles();
-        // 延迟一小会儿开始打字，增加仪式感
         setTimeout(typeMonologue, 1000); 
     };
     </script>
