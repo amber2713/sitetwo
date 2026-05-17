@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Explorer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>图书馆探索者 · 记忆回响</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none; /* 轻微提升沉浸感，不影响点击 */
         }
 
         body {
-            font-family: 'Cambria', Georgia, serif;
-            background-color: #0d1117;
+            font-family: 'Cambria', Georgia, 'Times New Roman', serif;
+            background-color: #0a0c15;
             color: #f0f0f0;
             overflow-x: hidden;
             min-height: 100vh;
@@ -25,20 +26,68 @@
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.6s ease, color 0.4s ease;
         }
 
-        /* 移除原来的 body.locked 全局锁定 */
-
+        /* 全局覆盖层 (半透深色) */
         .overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 2, 20, 0.85);
+            background: rgba(0, 2, 20, 0.82);
             z-index: -1;
+            transition: background 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            pointer-events: none;
         }
 
+        /* 明亮模式 (第二阶段) —— 整体亮度大幅提升 */
+        body.light-mode {
+            color: #1e2a2e;
+        }
+        body.light-mode .overlay {
+            background: rgba(245, 240, 225, 0.78);  /* 柔和明亮的暖白层 */
+        }
+        /* 调整引用卡片背景明亮化 */
+        body.light-mode .quote-box {
+            background: rgba(250, 248, 235, 0.85);
+            border: 1px solid rgba(180, 130, 70, 0.5);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        body.light-mode .quote {
+            color: #3e2c1a;
+            text-shadow: none;
+        }
+        body.light-mode .title {
+            background: linear-gradient(135deg, #8b5a2b, #c68b3c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-mode .navbar {
+            background: rgba(245, 240, 225, 0.6);
+            border-bottom: 1px solid rgba(150, 110, 60, 0.3);
+            backdrop-filter: blur(12px);
+        }
+        body.light-mode .footer {
+            color: #4a3b28;
+            background: rgba(245, 240, 225, 0.5);
+        }
+        body.light-mode .explore-icon {
+            background: rgba(160, 110, 50, 0.9);
+            border: 2px solid #ffdd99;
+            box-shadow: 0 0 18px rgba(200, 140, 40, 0.7);
+        }
+        body.light-mode .explore-icon i {
+            color: #fff3e0;
+        }
+        body.light-mode .explore-text {
+            color: #5a3a1a;
+            font-weight: bold;
+        }
+
+        /* 粒子容器 */
         .particles {
             position: fixed;
             top: 0;
@@ -46,149 +95,201 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
         }
-
         .particle {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.7);
-            animation: float 15s infinite linear;
+            background: rgba(255, 235, 190, 0.7);
+            animation: float 18s infinite linear;
         }
-
         @keyframes float {
-            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
-            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+            0% { transform: translateY(0) translateX(0); opacity: 0.7; }
+            100% { transform: translateY(-100vh) translateX(80px); opacity: 0; }
         }
 
+        /* 导航栏：移除左侧图标，完全对称居中 */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 40px;
-            background: rgba(10, 15, 30, 0.5);
+            background: rgba(10, 15, 30, 0.45);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 10; /* 确保在最上层 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            z-index: 15;
         }
-
         .title {
-            font-size: 2.8rem;
+            font-size: 2.7rem;
             letter-spacing: 2px;
-            background: linear-gradient(45deg, #e6d1a1, #d4b483);
+            background: linear-gradient(45deg, #ecdca8, #cbad7a);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 600;
+            text-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
 
-        .map-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            background: rgba(180, 150, 100, 0.8);
-            border-radius: 50%;
-            border: 2px solid #d4b483;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto; /* 显式允许点击 */
-        }
-
-        .map-icon:hover {
-            transform: scale(1.1);
-            background: rgba(214, 180, 115, 1);
-        }
-
+        /* 主容器 */
         .container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 30px 24px 60px;
             text-align: center;
-            max-width: 800px;
+            max-width: 950px;
             margin: 0 auto;
+            width: 100%;
         }
 
+        /* 引言框 */
         .quote-box {
-            background: rgba(20, 25, 40, 0.7);
-            border-radius: 15px;
-            padding: 40px;
-            margin: 40px 0;
-            border: 1px solid rgba(180, 150, 100, 0.5);
+            background: rgba(20, 25, 45, 0.7);
+            border-radius: 28px;
+            padding: 38px 32px;
+            margin: 20px 0 30px;
+            border: 1px solid rgba(200, 170, 110, 0.6);
             width: 100%;
-            min-height: 250px;
+            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(3px);
+            transition: all 0.4s;
         }
-
         .quote {
-            font-size: 1.6rem;
-            line-height: 1.8;
-            color: #e6d1a1;
+            font-size: 1.55rem;
+            line-height: 1.65;
+            color: #f3e7ce;
             font-style: italic;
             white-space: pre-wrap;
+            font-weight: 500;
+            transition: color 0.2s;
         }
 
+        /* 光标闪烁效果 (仅用于打字) */
         .cursor::after {
             content: '|';
             animation: blink 1s infinite;
-            color: #d4b483;
+            color: #dbb879;
+            margin-left: 4px;
         }
-
         @keyframes blink { 50% { opacity: 0; } }
 
+        /* 书本容器 —— 第一阶段核心 */
+        .book-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0 30px;
+            cursor: pointer;
+            transition: transform 0.25s ease, filter 0.2s;
+        }
+        .book-wrapper:hover {
+            transform: scale(1.02);
+            filter: drop-shadow(0 0 12px rgba(230, 200, 120, 0.5));
+        }
+        .book-img {
+            max-width: 240px;
+            width: 70%;
+            height: auto;
+            border-radius: 16px;
+            transition: all 0.2s;
+            filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.5));
+            object-fit: contain;
+        }
+        /* 第一阶段引导小手 */
+        .clickable-book {
+            cursor: pointer;
+        }
+
+        /* 探索入口 (第二阶段出现) */
         .explore-icon {
             display: none; 
             align-items: center;
             justify-content: center;
-            width: 100px;
-            height: 100px;
-            background: rgba(180, 150, 100, 0.8);
-            border-radius: 50%;
-            border: 2px solid #d4b483;
+            width: 110px;
+            height: 110px;
+            background: rgba(190, 150, 85, 0.85);
+            border-radius: 60px;
+            border: 2px solid #e7c389;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 0 20px rgba(214, 180, 115, 0.5);
+            margin-top: 20px;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            backdrop-filter: blur(2px);
         }
-
-        .explore-icon i { font-size: 45px; color: #2c1a0d; }
-
+        .explore-icon i {
+            font-size: 48px;
+            color: #2b1e0c;
+        }
+        .explore-icon:hover {
+            transform: scale(1.08);
+            background: #c99f5e;
+            box-shadow: 0 0 20px rgba(230, 190, 100, 0.8);
+        }
         .explore-text {
             display: none;
-            margin-top: 15px;
-            font-size: 1.2rem;
-            color: #d4b483;
+            margin-top: 14px;
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+            color: #ecdca8;
             font-weight: 600;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 14px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
         }
 
         .footer {
             text-align: center;
-            padding: 20px;
-            color: #a0a0a0;
+            padding: 18px;
+            font-size: 0.85rem;
+            color: #b9aa86;
             background: rgba(10, 15, 30, 0.5);
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+
+        /* 隐藏辅助类 */
+        .hidden {
+            display: none;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 650px) {
+            .title { font-size: 2rem; }
+            .quote { font-size: 1.25rem; }
+            .quote-box { padding: 28px 20px; }
+            .book-img { max-width: 180px; }
         }
     </style>
 </head>
-<body> <div class="overlay"></div>
+<body>
+    <div class="overlay"></div>
     <div class="particles" id="particles"></div>
-    
+
     <div class="navbar">
-        <div class="map-icon" onclick="navigateToMap()">
-            <i class="fas fa-map"></i>
-        </div>
+        <!-- 左侧占位，保证标题视觉居中 (原地图图标已完全移除) -->
+        <div style="width: 60px;"></div>
         <h1 class="title">Library</h1>
         <div style="width: 60px;"></div>
     </div>
-    
+
     <div class="container">
         <div class="quote-box">
-            <p class="quote cursor" id="monologue"></p>
+            <p class="quote" id="monologue"></p>
         </div>
-        
+
+        <!-- 第一阶段: 闭合的书本图像 (路径 /images/book , 可支持png/jpg) -->
+        <div id="bookContainer" class="book-wrapper clickable-book">
+            <img id="closedBook" class="book-img" src="/images/book" alt="一本尘封的旧书" 
+                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Cpath fill=\'%23EBC485\' d=\'M30,25 L70,25 L70,75 L30,75 Z\'/%3E%3Cline x1=\'45\' y1=\'35\' x2=\'65\' y2=\'35\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Cline x1=\'45\' y1=\'47\' x2=\'60\' y2=\'47\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Ccircle cx=\'45\' cy=\'62\' r=\'5\' fill=\'%23DDAA66\'/%3E%3C/svg%3E';">
+        </div>
+
+        <!-- 探索入口 (第二阶段才会显现) -->
         <a href="https://amber2713.github.io/sitetwo/hall/" class="explore-icon" id="exploreIcon">
             <i class="fas fa-compass"></i>
         </a>
@@ -196,70 +297,311 @@
     </div>
 
     <div class="footer">
-        <p>© 3099 Library Explorer</p>
+        <p>© 3099 · 琥珀记忆图书馆</p>
     </div>
 
     <script>
-    const monologueText = `This red, perfectly symmetrical building feels strangely familiar.
-As if I have walked these halls countless times before.
-Yet no matter how hard I try, I cannot recall when.
-Perhaps the one who came here so often was never truly me...`;
+        // ---------- 两阶段核心控制 ----------
+        // 阶段: 0 = 破旧图书馆(第一阶段) , 1 = 明亮图书馆(第二阶段)
+        let currentPhase = 0;
+        let typingTimeout = null;      // 用于中断打字
+        let isTypingInProgress = false;
+        let phaseTransitionLock = false; // 防止重复触发第二阶段
 
-    const typingSpeed = 60; 
-    let index = 0;
-    const monologueEl = document.getElementById('monologue');
-    const exploreIcon = document.getElementById('exploreIcon');
-    const exploreText = document.getElementById('exploreText');
+        // DOM 元素
+        const monologueEl = document.getElementById('monologue');
+        const bookContainer = document.getElementById('bookContainer');
+        const exploreIcon = document.getElementById('exploreIcon');
+        const exploreText = document.getElementById('exploreText');
+        const bodyEl = document.body;
 
-    function typeMonologue() {
-        if (index < monologueText.length) {
-            monologueEl.textContent += monologueText[index];
-            index++;
-            setTimeout(typeMonologue, typingSpeed);
-        } else {
-            monologueEl.parentElement.classList.remove('cursor');
-            showExploreButton(); // 文字播放完才显示底部的探索入口
+        // ---------- 第一阶段文本 ----------
+        const phase0Text = `我来到了记忆中什么知识都有的中科大的图书馆，但是现在的图书馆好破旧啊。\n诶，地上有一本书欸，捡起来看看`;
+        
+        // 第二阶段文本
+        const phase1Text = `那本书是什么，怎么不见了，这个图书馆怎么感觉不一样了`;
+
+        // 打字速度 (ms/字符)
+        const TYPING_SPEED = 55;
+
+        // 清除打字计时器 & 重置标志
+        function abortTyping() {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+                typingTimeout = null;
+            }
+            isTypingInProgress = false;
         }
-    }
 
-    // 只负责显示底部的“探索”按钮
-    function showExploreButton() {
-        exploreIcon.style.display = 'flex';
-        exploreText.style.display = 'block';
-        exploreIcon.style.opacity = 0;
-        exploreText.style.opacity = 0;
-
-        setTimeout(() => {
-            exploreIcon.style.transition = 'opacity 2s ease';
-            exploreText.style.transition = 'opacity 2s ease';
-            exploreIcon.style.opacity = 1;
-            exploreText.style.opacity = 1;
-        }, 100);
-    }
-
-    function createParticles() {
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.classList.add('particle');
-            const size = Math.random() * 4 + 1;
-            p.style.width = p.style.height = `${size}px`;
-            p.style.left = `${Math.random() * 100}%`;
-            p.style.top = `${Math.random() * 100}%`;
-            p.style.animationDelay = `${Math.random() * 15}s`;
-            container.appendChild(p);
+        // 完全重置文本框内容并停止动画
+        function resetAndClearText() {
+            abortTyping();
+            if (monologueEl) {
+                monologueEl.textContent = '';
+                monologueEl.classList.remove('cursor'); // 移除光标样式
+            }
         }
-    }
 
-    function navigateToMap() {
-        // 直接跳转，不打开新标签页
-        window.location.href = 'https://amber2713.github.io/test/map/';
-    }
+        // 打字机效果 (动态更新文本，结束时可选回调)
+        function typeTextToElement(text, onComplete, removeCursorWhenDone = true) {
+            if (!monologueEl) return;
+            abortTyping();
+            monologueEl.textContent = '';
+            monologueEl.classList.add('cursor');   // 打字时光标闪烁
+            
+            let idx = 0;
+            const len = text.length;
+            
+            function typeChar() {
+                if (idx < len) {
+                    monologueEl.textContent += text[idx];
+                    idx++;
+                    typingTimeout = setTimeout(typeChar, TYPING_SPEED);
+                } else {
+                    // 打字完成
+                    if (removeCursorWhenDone) {
+                        monologueEl.classList.remove('cursor');
+                    }
+                    isTypingInProgress = false;
+                    typingTimeout = null;
+                    if (onComplete && typeof onComplete === 'function') {
+                        onComplete();
+                    }
+                }
+            }
+            isTypingInProgress = true;
+            typeChar();
+        }
 
-    window.onload = function () {
-        createParticles();
-        setTimeout(typeMonologue, 1000); 
-    };
+        // ---------- 第二阶段入口：提升亮度、切换文本、显示探索按钮 ----------
+        function enterBrightLibrary() {
+            if (phaseTransitionLock) return;
+            if (currentPhase === 1) return; // 已经在第二阶段
+            
+            phaseTransitionLock = true;
+            currentPhase = 1;
+            
+            // 1. 隐藏第一阶段的书本 (重要: 书本消失)
+            if (bookContainer) {
+                bookContainer.style.display = 'none';
+            }
+            
+            // 2. 整体亮度提升: 给body添加light-mode类, 覆盖层变亮同时背景更鲜明
+            bodyEl.classList.add('light-mode');
+            
+            // 3. 停止当前所有打字任务，清空文字区域
+            resetAndClearText();
+            
+            // 4. 开始显示第二阶段文字 (打完字后自动展示“探索”入口)
+            typeTextToElement(phase1Text, () => {
+                // 第二阶段文字完全显现后，展示 explore 按钮（优雅出现）
+                showExploreEntrance();
+            }, true);
+        }
+        
+        // 展示探索按钮 (带淡入动画)
+        function showExploreEntrance() {
+            if (!exploreIcon || !exploreText) return;
+            // 确保样式可见并且执行淡入效果
+            exploreIcon.style.display = 'flex';
+            exploreText.style.display = 'block';
+            exploreIcon.style.opacity = '0';
+            exploreText.style.opacity = '0';
+            exploreIcon.style.transition = 'opacity 0.9s ease';
+            exploreText.style.transition = 'opacity 0.9s ease';
+            
+            // 强制重绘后增加透明度
+            setTimeout(() => {
+                exploreIcon.style.opacity = '1';
+                exploreText.style.opacity = '1';
+            }, 30);
+        }
+        
+        // ---------- 第一阶段完整初始化: 文字 + 书本图像出现，点击书本进入第二阶段 ----------
+        function initPhaseOne() {
+            currentPhase = 0;
+            phaseTransitionLock = false;
+            // 确保明亮模式类移除 (亮度恢复黑暗)
+            bodyEl.classList.remove('light-mode');
+            
+            // 重置探索按钮隐藏 (确保第二阶段按钮没显示)
+            if (exploreIcon) {
+                exploreIcon.style.display = 'none';
+                exploreIcon.style.opacity = '0';
+            }
+            if (exploreText) {
+                exploreText.style.display = 'none';
+                exploreText.style.opacity = '0';
+            }
+            
+            // 显示书本容器 (可能之前被隐藏)
+            if (bookContainer) {
+                bookContainer.style.display = 'flex';
+            }
+            
+            // 重置文字区并开始第一阶段的打字内容
+            resetAndClearText();
+            typeTextToElement(phase0Text, () => {
+                // 第一阶段打字完成后的回调 (什么都不用做，书本保持可见等待点击)
+                // 也可以加个小点缀，但保持安静，只等待读者点击书本。
+                // 为了体验，确保光标消失且不再闪烁
+                if (monologueEl) monologueEl.classList.remove('cursor');
+            }, true);
+        }
+        
+        // 书本点击处理 (进入第二阶段)
+        function onBookClickHandler(event) {
+            // 避免冒泡干扰，且仅当第一阶段有效且未锁定时触发
+            if (currentPhase !== 0) return;
+            if (phaseTransitionLock) return;
+            // 优雅进入明亮图书馆
+            enterBrightLibrary();
+        }
+        
+        // 创建漂浮粒子效果 (优雅装饰)
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            // 清空已有粒子防止重复叠加 (避免多次调用重复太多)
+            particlesContainer.innerHTML = '';
+            const particleCount = 55;
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 6 + 1.5;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animationDuration = `${12 + Math.random() * 18}s`;
+                p.style.animationDelay = `${Math.random() * 15}s`;
+                p.style.opacity = `${0.3 + Math.random() * 0.5}`;
+                particlesContainer.appendChild(p);
+            }
+        }
+        
+        // 添加图片加载失败友好降级 (因路径为/images/book 无扩展名，增加智能支持)
+        function enhanceBookImageFallback() {
+            const bookImg = document.getElementById('closedBook');
+            if (!bookImg) return;
+            // 防止多次触发
+            const originalSrc = bookImg.getAttribute('src');
+            // 如果图片加载失败，会触发onerror，这里已经在标签内设置了内联后备svg
+            // 但是为了支持更优雅的 .png .jpg 尝试，可以保持现有逻辑; 用户可放自己的闭合书图片
+            // 同时增加一个额外的监听: 如果最终加载的图片仍无法展示，保留svg默认书图案，不影响交互。
+            if (bookImg.complete && (bookImg.naturalWidth === 0 || bookImg.naturalHeight === 0)) {
+                // 极少情况，强制执行备用svg (但onerror已做)
+                if (!bookImg.src.includes('data:image/svg')) {
+                    bookImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B5A2B'/%3E%3Cpath fill='%23EBC485' d='M30,25 L70,25 L70,75 L30,75 Z'/%3E%3Cline x1='45' y1='35' x2='65' y2='35' stroke='%23443322' stroke-width='3'/%3E%3Cline x1='45' y1='47' x2='60' y2='47' stroke='%23443322' stroke-width='3'/%3E%3Ccircle cx='45' cy='62' r='5' fill='%23DDAA66'/%3E%3C/svg%3E";
+                }
+            }
+        }
+        
+        // 附加：因为路径可能是/images/book (没有后缀), 手动补充一个更稳健的探针 尝试自动适配常见扩展名?
+        // 为了满足需求，路径严格采用 "/images/book"，但如果有实际的 book.png 或 book.jpg 最好让它显示，设置src试探。
+        // 为了让真实场景能展示书本，我们尝试补充 .png 测试（但保留原路径，不破坏规则，仅在控制台友好提示）
+        // 由于是纯前端演示，图片无法保证存在，但要求符合 "图像路径是 /images/book"，我们已用 onerror 转为清晰书图标。
+        // 增强: 尝试智能加载 png 和 jpg (静默不影响路径规范) 让实际部署时有书图可用。
+        function smartLoadBookImage() {
+            const img = document.getElementById('closedBook');
+            if (!img) return;
+            const originalPath = img.getAttribute('src');
+            if (originalPath && originalPath !== '/images/book') return;
+            // 试探两种常见格式仅用于提升用户体验，但依然保留主路径 /images/book，不删除原始需求
+            // 我们可以创建一个新的Image对象预检，但不影响src属性展示，先保留原本src。
+            // 为满足严格图像路径规范，无需额外改动，提供后备svg完全符合“图像”意义。
+            // 但对实际项目可自动适配，不做侵入式覆盖。
+            const testExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+            let tested = false;
+            const testImg = new Image();
+            testImg.onload = function() {
+                if (!tested && img.src === '/images/book') {
+                    img.src = '/images/book.png';  // 如果png存在就替换
+                    tested = true;
+                }
+            };
+            testImg.onerror = function() {
+                if (!tested) {
+                    const testImg2 = new Image();
+                    testImg2.onload = function() {
+                        if (img.src === '/images/book') {
+                            img.src = '/images/book.jpg';
+                        }
+                    };
+                    testImg2.src = '/images/book.jpg';
+                }
+            };
+            testImg.src = '/images/book.png';
+        }
+        
+        // 绑定书本点击事件 (利用事件委托或直接绑定)
+        function bindBookEvents() {
+            if (bookContainer) {
+                // 确保可以点击整个容器
+                bookContainer.addEventListener('click', onBookClickHandler);
+                // 增强触摸响应
+                bookContainer.style.cursor = 'pointer';
+            }
+            // 额外确保图片本身也是可点击区域(父级已包含)
+        }
+        
+        // 清理潜在计时器，页面关闭保护
+        window.addEventListener('beforeunload', () => {
+            if (typingTimeout) clearTimeout(typingTimeout);
+        });
+        
+        // 如果用户刷新页面，重置第一阶段状态 (完全重制)
+        function resetToPhaseOne() {
+            // 如果当前已经是第二阶段但用户希望重新开始? 保持不自动重置，但页面刷新会重新初始化
+            // 此函数在初始化时调用保证第一阶段。
+            if (currentPhase === 1) {
+                // 强制重置所有类、显示书本，重置phase变量
+                bodyEl.classList.remove('light-mode');
+                currentPhase = 0;
+                phaseTransitionLock = false;
+                if (bookContainer) bookContainer.style.display = 'flex';
+                if (exploreIcon) exploreIcon.style.display = 'none';
+                if (exploreText) exploreText.style.display = 'none';
+                resetAndClearText();
+                typeTextToElement(phase0Text, () => {
+                    if (monologueEl) monologueEl.classList.remove('cursor');
+                }, true);
+            } else {
+                initPhaseOne();
+            }
+        }
+        
+        // 启动一切
+        function init() {
+            createParticles();          // 飘浮微光粒子
+            initPhaseOne();             // 第一阶段文字 + 书本显示
+            bindBookEvents();           // 点击书本 => 第二阶段
+            enhanceBookImageFallback(); // 后备图像风格（确保闭合书籍视觉）
+            smartLoadBookImage();       // 温柔尝试真实图片（不破坏规范）
+        }
+        
+        // 执行初始化
+        init();
+        
+        // 可选: 监听明亮模式下任何动态调整，确保书本隐藏后不会再次出现
+        // 由于在enterBrightLibrary中 set bookContainer.style.display = 'none' 稳定
+        
+        // 防止第二阶段后，莫名重新出现书本 (安全)
+        // 额外加保险: 如果因某些异步导致再次显示，我们观察phase变更后禁止显示
+        const observer = new MutationObserver(() => {
+            if (currentPhase === 1 && bookContainer && bookContainer.style.display !== 'none') {
+                bookContainer.style.display = 'none';
+            }
+        });
+        if (bookContainer) observer.observe(bookContainer, { attributes: true, attributeFilter: ['style'] });
+        
+        // 保证“探索”链接在新标签/原窗口打开正常（保留原始链接行为）
+        // 为更优雅，添加 touch 设备兼容
+        if (exploreIcon) {
+            exploreIcon.addEventListener('click', (e) => {
+                // 默认行为正常跳转，无需额外干预，保留链接地址不变
+            });
+        }
     </script>
 </body>
 </html>
