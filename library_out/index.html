@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Library · Quantum Rift</title>
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* subtle immersive feel, doesn't block clicks */
+        }
+
+        body {
+            font-family: 'Cambria', Georgia, 'Times New Roman', serif;
+            background-color: #0a0c15;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            background-image: url('./images/tushuguan.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* semi-transparent dark overlay for readability */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 2, 20, 0.82);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* floating particles (ambience) */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 235, 190, 0.65);
+            animation: float 18s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(80px); opacity: 0; }
+        }
+
+        /* navbar: includes custom right icon (random style) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(10, 15, 30, 0.45);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            z-index: 15;
+        }
+        .title {
+            font-size: 2.7rem;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ecdca8, #cbad7a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        /* right icon – appears only after the book image is shown */
+        .nav-icon {
+            width: 54px;
+            height: 54px;
+            background: rgba(180, 150, 95, 0.75);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(230, 200, 130, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.2), transform 0.3s ease, background 0.2s;
+        }
+        .nav-icon.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+        .nav-icon:hover {
+            background: rgba(210, 170, 95, 0.95);
+            transform: scale(1.07);
+            box-shadow: 0 0 12px rgba(230, 190, 110, 0.6);
+        }
+        .nav-icon i {
+            font-size: 28px;
+            color: #2d2418;
+        }
+
+        /* spacer for left side to center title */
+        .nav-placeholder {
+            width: 54px;
+        }
+
+        /* main container */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 24px 60px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* quote / monologue box */
+        .quote-box {
+            background: rgba(20, 25, 45, 0.7);
+            border-radius: 28px;
+            padding: 38px 32px;
+            margin: 20px 0 30px;
+            border: 1px solid rgba(200, 170, 110, 0.6);
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+            transition: all 0.3s;
+        }
+        .quote {
+            font-size: 1.55rem;
+            line-height: 1.65;
+            color: #f3e7ce;
+            font-style: italic;
+            white-space: pre-wrap;
+            font-weight: 500;
+        }
+
+        /* blinking cursor for typing */
+        .cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+            color: #dbb879;
+            margin-left: 4px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* book image container – appears after typing finishes */
+        .book-phase {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0 20px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.7s ease, transform 0.6s ease;
+            pointer-events: none;  /* image is just for vision, no click needed */
+        }
+        .book-phase.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .book2-img {
+            max-width: 380px;
+            width: 75%;
+            border-radius: 20px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            border: 2px solid rgba(210, 175, 95, 0.6);
+            object-fit: cover;
+            background: #2a2418;
+            transition: filter 0.2s;
+        }
+
+        /* optional subtle caption */
+        .image-hint {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #c9b586;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 18px;
+            font-size: 0.85rem;
+            color: #b9aa86;
+            background: rgba(10, 15, 30, 0.5);
+            margin-top: 30px;
+        }
+
+        @media (max-width: 650px) {
+            .title { font-size: 2rem; }
+            .quote { font-size: 1.2rem; }
+            .quote-box { padding: 28px 20px; }
+            .book2-img { max-width: 260px; }
+            .nav-icon { width: 46px; height: 46px; }
+            .nav-icon i { font-size: 24px; }
+            .nav-placeholder { width: 46px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="navbar">
+        <!-- empty placeholder to keep title centered -->
+        <div class="nav-placeholder"></div>
+        <h1 class="title">Library</h1>
+        <!-- right side icon (random style, appears after book2 image) -->
+        <div id="rightIcon" class="nav-icon">
+            <i class="fas fa-chess-queen"></i>  <!-- random iconic look: royal & mysterious -->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="quote-box">
+            <p class="quote" id="monologue"></p>
+        </div>
+
+        <!-- book2 image container (will show after monologue finishes) -->
+        <div id="book2Container" class="book-phase">
+            <img id="book2Img" class="book2-img" src="/images/book2.jpg" alt="A mysterious book lying on the floor" 
+                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%234d3a22\'/%3E%3Ctext x=\'50\' y=\'55\' font-size=\'14\' text-anchor=\'middle\' fill=\'%23ebc48c\'%3E📖 book%3C/text%3E%3C/svg%3E';">
+            <div class="image-hint">✦ a flicker of quantum parchment ✦</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 3099 · USTC Quantum Corridor</p>
+    </div>
+
+    <script>
+        // ---------- SINGLE STAGE NARRATIVE ----------
+        // 1. Type out the full English monologue.
+        // 2. After typing finishes, reveal book2.jpg image (fade-in).
+        // 3. After the image is revealed, show the top-right icon (nav-icon).
+        
+        const monologueText = `What's happening to me? I've returned to the library again... I was just at the Old North Gate. Could this be the super quantum teleportation technology developed by USTC scientists? And I remember that just a moment ago, Mr. Guo Moruo suggested I head to the West Campus...`;
+        
+        const TYPING_SPEED = 48;   // comfortable reading speed
+        let typingTimeout = null;
+        let isTyping = false;
+        
+        // DOM elements
+        const monologueEl = document.getElementById('monologue');
+        const book2Container = document.getElementById('book2Container');
+        const rightIcon = document.getElementById('rightIcon');
+        
+        // --- helpers ---
+        function abortTyping() {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+                typingTimeout = null;
+            }
+            isTyping = false;
+        }
+        
+        function resetAndClearText() {
+            abortTyping();
+            if (monologueEl) {
+                monologueEl.textContent = '';
+                monologueEl.classList.remove('cursor');
+            }
+        }
+        
+        // Typing effect (with cursor blinking)
+        function typeTextToElement(text, onComplete) {
+            if (!monologueEl) return;
+            abortTyping();
+            monologueEl.textContent = '';
+            monologueEl.classList.add('cursor');
+            
+            let idx = 0;
+            const len = text.length;
+            
+            function typeChar() {
+                if (idx < len) {
+                    monologueEl.textContent += text[idx];
+                    idx++;
+                    typingTimeout = setTimeout(typeChar, TYPING_SPEED);
+                } else {
+                    // typing finished
+                    monologueEl.classList.remove('cursor');
+                    isTyping = false;
+                    typingTimeout = null;
+                    if (onComplete && typeof onComplete === 'function') {
+                        onComplete();
+                    }
+                }
+            }
+            isTyping = true;
+            typeChar();
+        }
+        
+        // Reveal book2 image gracefully
+        function revealBookImage() {
+            if (!book2Container) return;
+            // add class to trigger fade-in + slight upward motion
+            book2Container.classList.add('show');
+            
+            // After image is visible, then show the top‑right icon
+            // give a little delay to allow the image transition to feel natural
+            setTimeout(() => {
+                revealNavIcon();
+            }, 420); // matches transition feeling
+        }
+        
+        // Show the right icon (random style already chosen but we make it visible)
+        function revealNavIcon() {
+            if (!rightIcon) return;
+            rightIcon.classList.add('visible');
+            // attach the navigation event only after icon appears
+            rightIcon.addEventListener('click', navigateToIntroduction);
+        }
+        
+        // Navigation to the specific URL (https://amber2713.github.io/Juan/introduction)
+        function navigateToIntroduction() {
+            window.location.href = 'https://amber2713.github.io/Juan/introduction/';
+        }
+        
+        // --- particle background (enhanced mood) ---
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            particlesContainer.innerHTML = '';
+            const particleCount = 55;
+            for (let i = 0; i < particleCount; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 6 + 1.5;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animationDuration = `${12 + Math.random() * 18}s`;
+                p.style.animationDelay = `${Math.random() * 15}s`;
+                p.style.opacity = `${0.3 + Math.random() * 0.5}`;
+                particlesContainer.appendChild(p);
+            }
+        }
+        
+        // ---- image fallback cleverness: ensure book2.jpg is shown even if missing (graceful)----
+        function enhanceBookImage() {
+            const img = document.getElementById('book2Img');
+            if (!img) return;
+            // if the image failed to load, onerror already replaced with inline emoji-svg, but we also 
+            // ensure that the alt is descriptive.
+            if (img.complete && (img.naturalWidth === 0 || img.naturalHeight === 0)) {
+                if (!img.src.includes('data:image/svg')) {
+                    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234d3a22'/%3E%3Ctext x='50' y='55' font-size='12' text-anchor='middle' fill='%23ebc48c'%3E📖 book2%3C/text%3E%3C/svg%3E";
+                }
+            }
+        }
+        
+        // attempt to preload friendly extensions if needed (without overriding the exact path)
+        function gentleImageEnhancement() {
+            const img = document.getElementById('book2Img');
+            if (!img) return;
+            const originalSrc = img.getAttribute('src');
+            if (originalSrc && originalSrc !== '/images/book2.jpg') return;
+            // if the server has book2.png or book2.jpeg we can try to upgrade, but keep path requirement
+            // just to be user-friendly we test png fallback for assets without breaking spec
+            const testImg = new Image();
+            testImg.onload = () => {
+                if (img.src === '/images/book2.jpg') {
+                    img.src = '/images/book2.png';
+                }
+            };
+            testImg.onerror = () => {
+                const testImgJpg = new Image();
+                testImgJpg.onload = () => {
+                    if (img.src === '/images/book2.jpg') {
+                        img.src = '/images/book2.jpeg';
+                    }
+                };
+                testImgJpg.src = '/images/book2.jpeg';
+            };
+            testImg.src = '/images/book2.png';
+        }
+        
+        // --- main execution (single phase) ---
+        function startExperience() {
+            // reset UI: make sure image container is hidden (no show class)
+            if (book2Container) book2Container.classList.remove('show');
+            // hide right icon initially
+            if (rightIcon) rightIcon.classList.remove('visible');
+            // remove any lingering click listener duplication
+            // start typing monologue
+            resetAndClearText();
+            typeTextToElement(monologueText, () => {
+                // typing complete → reveal the image (book2.jpg)
+                revealBookImage();
+            });
+        }
+        
+        // ---------- random icon style selection (spontaneous, unique) ----------
+        function assignRandomIcon() {
+            if (!rightIcon) return;
+            // array of mystical / library-themed icons from FontAwesome 6 (free)
+            const iconSet = [
+                "fas fa-dragon",           // mythical
+                "fas fa-feather-alt",      // quill / feather
+                "fas fa-scroll",           // ancient scroll
+                "fas fa-ghost",            // quantum ghost
+                "fas fa-crystal-ball",      // mystery
+                "fas fa-robot",            // futuristic twist
+                "fas fa-brain",            // intelligence
+                "fas fa-glasses",           // scholar
+                "fas fa-unlock-alt",        // gate to knowledge
+                "fas fa-compass",           // guidance
+                "fas fa-key",               // secret entrance
+                "fas fa-meteor"             // cosmic
+            ];
+            const randomIndex = Math.floor(Math.random() * iconSet.length);
+            const chosenIcon = iconSet[randomIndex];
+            // replace the <i> class inside .nav-icon
+            const iconElement = rightIcon.querySelector('i');
+            if (iconElement) {
+                // remove existing classes but keep 'fa' and 'fas' base?
+                iconElement.className = ''; 
+                iconElement.classList.add(...chosenIcon.split(' '));
+            } else {
+                // fallback: create i
+                const newIcon = document.createElement('i');
+                chosenIcon.split(' ').forEach(cls => newIcon.classList.add(cls));
+                rightIcon.appendChild(newIcon);
+            }
+        }
+        
+        // window load: create particles, assign random icon, then start the sequence
+        window.addEventListener('load', () => {
+            createParticles();
+            assignRandomIcon();   // random icon appears in the upper right, but visibility hidden until final stage
+            enhanceBookImage();
+            gentleImageEnhancement();
+            startExperience();
+        });
+        
+        // Ensure icon click doesn't accidentally trigger before it's visible
+        // (the event listener is added only after icon becomes visible via revealNavIcon)
+        // but we avoid double listeners: we set once inside revealNavIcon.
+        // Also prevent any stray clicks before icon is active
+        if (rightIcon) {
+            // initial state: no click handler for navigation (just in case)
+            rightIcon.style.pointerEvents = 'none';
+        }
+        // override after revealNavIcon, it sets pointer-events: auto via .visible class and adds listener.
+    </script>
+</body>
+</html>
