@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>图书馆探索者 · 记忆回响</title>
+    <title>Library Explorer · Echoes of Memory</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 轻微提升沉浸感，不影响点击 */
+            user-select: none; /* enhances immersion, click remains functional */
         }
 
         body {
@@ -29,7 +29,7 @@
             transition: background-color 0.6s ease, color 0.4s ease;
         }
 
-        /* 全局覆盖层 (半透深色) */
+        /* semi-transparent dark overlay */
         .overlay {
             position: fixed;
             top: 0;
@@ -42,14 +42,13 @@
             pointer-events: none;
         }
 
-        /* 明亮模式 (第二阶段) —— 整体亮度大幅提升 */
+        /* LIGHT MODE (phase two) – significantly brighter */
         body.light-mode {
             color: #1e2a2e;
         }
         body.light-mode .overlay {
-            background: rgba(245, 240, 225, 0.78);  /* 柔和明亮的暖白层 */
+            background: rgba(245, 240, 225, 0.78);
         }
-        /* 调整引用卡片背景明亮化 */
         body.light-mode .quote-box {
             background: rgba(250, 248, 235, 0.85);
             border: 1px solid rgba(180, 130, 70, 0.5);
@@ -87,7 +86,7 @@
             font-weight: bold;
         }
 
-        /* 粒子容器 */
+        /* floating particles */
         .particles {
             position: fixed;
             top: 0;
@@ -108,7 +107,7 @@
             100% { transform: translateY(-100vh) translateX(80px); opacity: 0; }
         }
 
-        /* 导航栏：移除左侧图标，完全对称居中 */
+        /* navbar - left icon removed */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -130,7 +129,7 @@
             text-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
 
-        /* 主容器 */
+        /* main container */
         .container {
             flex: 1;
             display: flex;
@@ -144,7 +143,7 @@
             width: 100%;
         }
 
-        /* 引言框 */
+        /* quote box */
         .quote-box {
             background: rgba(20, 25, 45, 0.7);
             border-radius: 28px;
@@ -169,7 +168,7 @@
             transition: color 0.2s;
         }
 
-        /* 光标闪烁效果 (仅用于打字) */
+        /* blinking cursor for typing */
         .cursor::after {
             content: '|';
             animation: blink 1s infinite;
@@ -178,7 +177,7 @@
         }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* 书本容器 —— 第一阶段核心 */
+        /* book container – phase one */
         .book-wrapper {
             display: flex;
             justify-content: center;
@@ -200,12 +199,11 @@
             filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.5));
             object-fit: contain;
         }
-        /* 第一阶段引导小手 */
         .clickable-book {
             cursor: pointer;
         }
 
-        /* 探索入口 (第二阶段出现) */
+        /* explore entrance (phase two) */
         .explore-icon {
             display: none; 
             align-items: center;
@@ -253,12 +251,10 @@
             margin-top: 30px;
         }
 
-        /* 隐藏辅助类 */
         .hidden {
             display: none;
         }
 
-        /* 响应式微调 */
         @media (max-width: 650px) {
             .title { font-size: 2rem; }
             .quote { font-size: 1.25rem; }
@@ -272,7 +268,7 @@
     <div class="particles" id="particles"></div>
 
     <div class="navbar">
-        <!-- 左侧占位，保证标题视觉居中 (原地图图标已完全移除) -->
+        <!-- empty placeholder to keep title centered (map icon removed) -->
         <div style="width: 60px;"></div>
         <h1 class="title">Library</h1>
         <div style="width: 60px;"></div>
@@ -283,13 +279,13 @@
             <p class="quote" id="monologue"></p>
         </div>
 
-        <!-- 第一阶段: 闭合的书本图像 (路径 /images/book , 可支持png/jpg) -->
+        <!-- Phase One: closed book image (path /images/book) -->
         <div id="bookContainer" class="book-wrapper clickable-book">
-            <img id="closedBook" class="book-img" src="/images/book" alt="一本尘封的旧书" 
+            <img id="closedBook" class="book-img" src="/images/book" alt="A dusty old book" 
                  onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Cpath fill=\'%23EBC485\' d=\'M30,25 L70,25 L70,75 L30,75 Z\'/%3E%3Cline x1=\'45\' y1=\'35\' x2=\'65\' y2=\'35\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Cline x1=\'45\' y1=\'47\' x2=\'60\' y2=\'47\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Ccircle cx=\'45\' cy=\'62\' r=\'5\' fill=\'%23DDAA66\'/%3E%3C/svg%3E';">
         </div>
 
-        <!-- 探索入口 (第二阶段才会显现) -->
+        <!-- Explore entrance (appears in phase two) -->
         <a href="https://amber2713.github.io/sitetwo/hall/" class="explore-icon" id="exploreIcon">
             <i class="fas fa-compass"></i>
         </a>
@@ -297,34 +293,33 @@
     </div>
 
     <div class="footer">
-        <p>© 3099 · 琥珀记忆图书馆</p>
+        <p>© 3099 · Library of Recollection</p>
     </div>
 
     <script>
-        // ---------- 两阶段核心控制 ----------
-        // 阶段: 0 = 破旧图书馆(第一阶段) , 1 = 明亮图书馆(第二阶段)
+        // ========== TWO-PHASE NARRATIVE ==========
+        // Phase 0: dilapidated library (initial)
+        // Phase 1: bright, transformed library
+        
         let currentPhase = 0;
-        let typingTimeout = null;      // 用于中断打字
+        let typingTimeout = null;
         let isTypingInProgress = false;
-        let phaseTransitionLock = false; // 防止重复触发第二阶段
+        let phaseTransitionLock = false;
 
-        // DOM 元素
+        // DOM elements
         const monologueEl = document.getElementById('monologue');
         const bookContainer = document.getElementById('bookContainer');
         const exploreIcon = document.getElementById('exploreIcon');
         const exploreText = document.getElementById('exploreText');
         const bodyEl = document.body;
 
-        // ---------- 第一阶段文本 ----------
-        const phase0Text = `我来到了记忆中什么知识都有的中科大的图书馆，但是现在的图书馆好破旧啊。\n诶，地上有一本书欸，捡起来看看`;
+        // ---------- ENGLISH TEXTS (fully localized) ----------
+        const phase0Text = `I've come to the library of USTC, which in my memory holds all knowledge, but it looks so dilapidated now.\nHey, there's a book on the floor. Let me pick it up and see.`;
         
-        // 第二阶段文本
-        const phase1Text = `那本书是什么，怎么不见了，这个图书馆怎么感觉不一样了`;
+        const phase1Text = `What was that book? It's gone. This library feels different now.`;
 
-        // 打字速度 (ms/字符)
         const TYPING_SPEED = 55;
 
-        // 清除打字计时器 & 重置标志
         function abortTyping() {
             if (typingTimeout) {
                 clearTimeout(typingTimeout);
@@ -333,21 +328,20 @@
             isTypingInProgress = false;
         }
 
-        // 完全重置文本框内容并停止动画
         function resetAndClearText() {
             abortTyping();
             if (monologueEl) {
                 monologueEl.textContent = '';
-                monologueEl.classList.remove('cursor'); // 移除光标样式
+                monologueEl.classList.remove('cursor');
             }
         }
 
-        // 打字机效果 (动态更新文本，结束时可选回调)
+        // Typewriter effect
         function typeTextToElement(text, onComplete, removeCursorWhenDone = true) {
             if (!monologueEl) return;
             abortTyping();
             monologueEl.textContent = '';
-            monologueEl.classList.add('cursor');   // 打字时光标闪烁
+            monologueEl.classList.add('cursor');
             
             let idx = 0;
             const len = text.length;
@@ -358,7 +352,6 @@
                     idx++;
                     typingTimeout = setTimeout(typeChar, TYPING_SPEED);
                 } else {
-                    // 打字完成
                     if (removeCursorWhenDone) {
                         monologueEl.classList.remove('cursor');
                     }
@@ -373,36 +366,34 @@
             typeChar();
         }
 
-        // ---------- 第二阶段入口：提升亮度、切换文本、显示探索按钮 ----------
+        // ---------- ENTER BRIGHT LIBRARY (PHASE TWO) ----------
         function enterBrightLibrary() {
             if (phaseTransitionLock) return;
-            if (currentPhase === 1) return; // 已经在第二阶段
+            if (currentPhase === 1) return;
             
             phaseTransitionLock = true;
             currentPhase = 1;
             
-            // 1. 隐藏第一阶段的书本 (重要: 书本消失)
+            // 1. Hide the closed book (phase one element)
             if (bookContainer) {
                 bookContainer.style.display = 'none';
             }
             
-            // 2. 整体亮度提升: 给body添加light-mode类, 覆盖层变亮同时背景更鲜明
+            // 2. Apply light mode class (brighter ambiance)
             bodyEl.classList.add('light-mode');
             
-            // 3. 停止当前所有打字任务，清空文字区域
+            // 3. Clear previous text and type phase one text
             resetAndClearText();
             
-            // 4. 开始显示第二阶段文字 (打完字后自动展示“探索”入口)
+            // 4. Type the phase two monologue, then reveal explore button
             typeTextToElement(phase1Text, () => {
-                // 第二阶段文字完全显现后，展示 explore 按钮（优雅出现）
                 showExploreEntrance();
             }, true);
         }
         
-        // 展示探索按钮 (带淡入动画)
+        // Fade in the explore button and text
         function showExploreEntrance() {
             if (!exploreIcon || !exploreText) return;
-            // 确保样式可见并且执行淡入效果
             exploreIcon.style.display = 'flex';
             exploreText.style.display = 'block';
             exploreIcon.style.opacity = '0';
@@ -410,21 +401,20 @@
             exploreIcon.style.transition = 'opacity 0.9s ease';
             exploreText.style.transition = 'opacity 0.9s ease';
             
-            // 强制重绘后增加透明度
             setTimeout(() => {
                 exploreIcon.style.opacity = '1';
                 exploreText.style.opacity = '1';
             }, 30);
         }
         
-        // ---------- 第一阶段完整初始化: 文字 + 书本图像出现，点击书本进入第二阶段 ----------
+        // ---------- PHASE ONE INITIALIZATION ----------
         function initPhaseOne() {
             currentPhase = 0;
             phaseTransitionLock = false;
-            // 确保明亮模式类移除 (亮度恢复黑暗)
+            // Remove light mode class (dark atmosphere)
             bodyEl.classList.remove('light-mode');
             
-            // 重置探索按钮隐藏 (确保第二阶段按钮没显示)
+            // Hide explore entrance if visible
             if (exploreIcon) {
                 exploreIcon.style.display = 'none';
                 exploreIcon.style.opacity = '0';
@@ -434,35 +424,29 @@
                 exploreText.style.opacity = '0';
             }
             
-            // 显示书本容器 (可能之前被隐藏)
+            // Ensure book container is visible
             if (bookContainer) {
                 bookContainer.style.display = 'flex';
             }
             
-            // 重置文字区并开始第一阶段的打字内容
+            // Reset text and start typing phase 0 monologue
             resetAndClearText();
             typeTextToElement(phase0Text, () => {
-                // 第一阶段打字完成后的回调 (什么都不用做，书本保持可见等待点击)
-                // 也可以加个小点缀，但保持安静，只等待读者点击书本。
-                // 为了体验，确保光标消失且不再闪烁
                 if (monologueEl) monologueEl.classList.remove('cursor');
             }, true);
         }
         
-        // 书本点击处理 (进入第二阶段)
+        // Book click handler (transition to phase two)
         function onBookClickHandler(event) {
-            // 避免冒泡干扰，且仅当第一阶段有效且未锁定时触发
             if (currentPhase !== 0) return;
             if (phaseTransitionLock) return;
-            // 优雅进入明亮图书馆
             enterBrightLibrary();
         }
         
-        // 创建漂浮粒子效果 (优雅装饰)
+        // Create floating particles (decorative)
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             if (!particlesContainer) return;
-            // 清空已有粒子防止重复叠加 (避免多次调用重复太多)
             particlesContainer.innerHTML = '';
             const particleCount = 55;
             for (let i = 0; i < particleCount; i++) {
@@ -480,82 +464,55 @@
             }
         }
         
-        // 添加图片加载失败友好降级 (因路径为/images/book 无扩展名，增加智能支持)
+        // Robust image fallback handling (path /images/book)
         function enhanceBookImageFallback() {
             const bookImg = document.getElementById('closedBook');
             if (!bookImg) return;
-            // 防止多次触发
-            const originalSrc = bookImg.getAttribute('src');
-            // 如果图片加载失败，会触发onerror，这里已经在标签内设置了内联后备svg
-            // 但是为了支持更优雅的 .png .jpg 尝试，可以保持现有逻辑; 用户可放自己的闭合书图片
-            // 同时增加一个额外的监听: 如果最终加载的图片仍无法展示，保留svg默认书图案，不影响交互。
             if (bookImg.complete && (bookImg.naturalWidth === 0 || bookImg.naturalHeight === 0)) {
-                // 极少情况，强制执行备用svg (但onerror已做)
                 if (!bookImg.src.includes('data:image/svg')) {
                     bookImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B5A2B'/%3E%3Cpath fill='%23EBC485' d='M30,25 L70,25 L70,75 L30,75 Z'/%3E%3Cline x1='45' y1='35' x2='65' y2='35' stroke='%23443322' stroke-width='3'/%3E%3Cline x1='45' y1='47' x2='60' y2='47' stroke='%23443322' stroke-width='3'/%3E%3Ccircle cx='45' cy='62' r='5' fill='%23DDAA66'/%3E%3C/svg%3E";
                 }
             }
         }
         
-        // 附加：因为路径可能是/images/book (没有后缀), 手动补充一个更稳健的探针 尝试自动适配常见扩展名?
-        // 为了满足需求，路径严格采用 "/images/book"，但如果有实际的 book.png 或 book.jpg 最好让它显示，设置src试探。
-        // 为了让真实场景能展示书本，我们尝试补充 .png 测试（但保留原路径，不破坏规则，仅在控制台友好提示）
-        // 由于是纯前端演示，图片无法保证存在，但要求符合 "图像路径是 /images/book"，我们已用 onerror 转为清晰书图标。
-        // 增强: 尝试智能加载 png 和 jpg (静默不影响路径规范) 让实际部署时有书图可用。
+        // Gentle attempt to load real images without breaking path specification
         function smartLoadBookImage() {
             const img = document.getElementById('closedBook');
             if (!img) return;
             const originalPath = img.getAttribute('src');
             if (originalPath && originalPath !== '/images/book') return;
-            // 试探两种常见格式仅用于提升用户体验，但依然保留主路径 /images/book，不删除原始需求
-            // 我们可以创建一个新的Image对象预检，但不影响src属性展示，先保留原本src。
-            // 为满足严格图像路径规范，无需额外改动，提供后备svg完全符合“图像”意义。
-            // 但对实际项目可自动适配，不做侵入式覆盖。
-            const testExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
-            let tested = false;
             const testImg = new Image();
             testImg.onload = function() {
-                if (!tested && img.src === '/images/book') {
-                    img.src = '/images/book.png';  // 如果png存在就替换
-                    tested = true;
+                if (img.src === '/images/book') {
+                    img.src = '/images/book.png';
                 }
             };
             testImg.onerror = function() {
-                if (!tested) {
-                    const testImg2 = new Image();
-                    testImg2.onload = function() {
-                        if (img.src === '/images/book') {
-                            img.src = '/images/book.jpg';
-                        }
-                    };
-                    testImg2.src = '/images/book.jpg';
-                }
+                const testImg2 = new Image();
+                testImg2.onload = function() {
+                    if (img.src === '/images/book') {
+                        img.src = '/images/book.jpg';
+                    }
+                };
+                testImg2.src = '/images/book.jpg';
             };
             testImg.src = '/images/book.png';
         }
         
-        // 绑定书本点击事件 (利用事件委托或直接绑定)
         function bindBookEvents() {
             if (bookContainer) {
-                // 确保可以点击整个容器
                 bookContainer.addEventListener('click', onBookClickHandler);
-                // 增强触摸响应
                 bookContainer.style.cursor = 'pointer';
             }
-            // 额外确保图片本身也是可点击区域(父级已包含)
         }
         
-        // 清理潜在计时器，页面关闭保护
         window.addEventListener('beforeunload', () => {
             if (typingTimeout) clearTimeout(typingTimeout);
         });
         
-        // 如果用户刷新页面，重置第一阶段状态 (完全重制)
+        // Ensure phase consistency after potential refresh
         function resetToPhaseOne() {
-            // 如果当前已经是第二阶段但用户希望重新开始? 保持不自动重置，但页面刷新会重新初始化
-            // 此函数在初始化时调用保证第一阶段。
             if (currentPhase === 1) {
-                // 强制重置所有类、显示书本，重置phase变量
                 bodyEl.classList.remove('light-mode');
                 currentPhase = 0;
                 phaseTransitionLock = false;
@@ -571,23 +528,17 @@
             }
         }
         
-        // 启动一切
         function init() {
-            createParticles();          // 飘浮微光粒子
-            initPhaseOne();             // 第一阶段文字 + 书本显示
-            bindBookEvents();           // 点击书本 => 第二阶段
-            enhanceBookImageFallback(); // 后备图像风格（确保闭合书籍视觉）
-            smartLoadBookImage();       // 温柔尝试真实图片（不破坏规范）
+            createParticles();
+            initPhaseOne();
+            bindBookEvents();
+            enhanceBookImageFallback();
+            smartLoadBookImage();
         }
         
-        // 执行初始化
         init();
         
-        // 可选: 监听明亮模式下任何动态调整，确保书本隐藏后不会再次出现
-        // 由于在enterBrightLibrary中 set bookContainer.style.display = 'none' 稳定
-        
-        // 防止第二阶段后，莫名重新出现书本 (安全)
-        // 额外加保险: 如果因某些异步导致再次显示，我们观察phase变更后禁止显示
+        // MutationObserver to ensure book stays hidden in phase two
         const observer = new MutationObserver(() => {
             if (currentPhase === 1 && bookContainer && bookContainer.style.display !== 'none') {
                 bookContainer.style.display = 'none';
@@ -595,11 +546,10 @@
         });
         if (bookContainer) observer.observe(bookContainer, { attributes: true, attributeFilter: ['style'] });
         
-        // 保证“探索”链接在新标签/原窗口打开正常（保留原始链接行为）
-        // 为更优雅，添加 touch 设备兼容
+        // Normal click behavior for explore link (preserves target URL)
         if (exploreIcon) {
             exploreIcon.addEventListener('click', (e) => {
-                // 默认行为正常跳转，无需额外干预，保留链接地址不变
+                // standard navigation, link unchanged
             });
         }
     </script>
