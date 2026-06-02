@@ -1,5 +1,5 @@
 {
-  "name": "ai-chat-app",
+  "name": "library",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
