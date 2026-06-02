@@ -97,39 +97,19 @@
         /* 导航区域 */
         .navigation {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 10%; /* 控制左侧和右侧导航之间的间距 */
             width: 100%;
             max-width: 1200px;
             margin-top: 2rem;
-            position: relative;
+            margin-bottom: 5rem; /* 为底部页脚留出空间 */
         }
         
         .nav-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 30%;
-        }
-        
-        /* 左侧导航 */
-        .left-nav {
-            position: absolute;
-            left: 5%;
-            top: 0;
-        }
-        
-        /* 右侧导航 */
-        .right-nav {
-            position: absolute;
-            right: 5%;
-            top: 0;
-        }
-        
-        /* 底部导航 */
-        .bottom-nav {
-            position: absolute;
-            left: 5%;
-            bottom: -50%;
+            width: 35%;
         }
         
         /* 图标样式 */
@@ -161,12 +141,6 @@
         .english-icon {
             background: linear-gradient(135deg, #e74c3c, #e67e22);
             box-shadow: 0 0 25px rgba(231, 76, 60, 0.5);
-        }
-        
-        /* 返回图标 */
-        .back-icon {
-            background: linear-gradient(135deg, #2ecc71, #1abc9c);
-            box-shadow: 0 0 25px rgba(46, 204, 113, 0.5);
         }
         
         /* 图标内部图形 */
@@ -233,13 +207,10 @@
             .navigation {
                 flex-direction: column;
                 align-items: center;
+                gap: 2rem;
             }
             
-            .left-nav, .right-nav, .bottom-nav {
-                position: relative;
-                left: auto;
-                right: auto;
-                bottom: auto;
+            .nav-section {
                 margin-bottom: 2rem;
                 width: 100%;
             }
@@ -267,8 +238,7 @@
         </div>
         
         <div class="navigation">
-            <!-- 左侧自习室导航 -->
-            <div class="nav-section left-nav">
+            <div class="nav-section">
                 <a href="https://sellf.netlify.app" class="nav-icon study-icon">
                     <div class="icon-content">
                         <i class="fas fa-book-open"></i>
@@ -278,8 +248,7 @@
                 <p>Quiet space for individual learning</p>
             </div>
             
-            <!-- 右侧英语中心导航 -->
-            <div class="nav-section right-nav">
+            <div class="nav-section">
                 <a href="https://englishcenter-ai.netlify.app" class="nav-icon english-icon">
                     <div class="icon-content">
                         <i class="fas fa-globe-americas"></i>
@@ -287,17 +256,6 @@
                 </a>
                 <div class="nav-label">English Learning Center</div>
                 <p>Resources for mastering English</p>
-            </div>
-            
-            <!-- 左下角返回导航 -->
-            <div class="nav-section bottom-nav">
-                <a href="https://libraryry.netlify.app" class="nav-icon back-icon">
-                    <div class="icon-content">
-                        <i class="fas fa-arrow-left"></i>
-                    </div>
-                </a>
-                <div class="nav-label">Back to Library</div>
-                <p>Return to main library area</p>
             </div>
         </div>
     </div>
