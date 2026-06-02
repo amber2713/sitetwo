@@ -664,32 +664,69 @@
             testImg.src = '/images/book.jpg';
         }
 
+        const chatHistory = [];
+
+        function escapeHtml(value) {
+            return value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function addChatMessage(role, content) {
             const chatDisplay = document.getElementById('chatDisplay');
             if (!chatDisplay) return;
             const message = document.createElement('div');
             message.className = 'ai-chat-message';
             const speaker = role === 'user' ? '你' : '守护者';
-            message.innerHTML = `<strong>${speaker}:</strong> ${content}`;
+            message.innerHTML = `<strong>${speaker}:</strong> ${escapeHtml(content)}`;
             chatDisplay.appendChild(message);
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
+            return message;
         }
 
-        function getReply(message) {
-            const normalized = message.toLowerCase();
-            if (normalized.includes('你好') || normalized.includes('hello')) {
-                return '你好，有什么想了解的，我会尽力回答。';
+        async function handleChat(text) {
+            chatHistory.push({ role: 'user', content: text });
+            addChatMessage('user', text);
+
+            const loadingMessage = addChatMessage('assistant', '守护者正在思考...');
+            const sendButton = document.getElementById('sendButton');
+            if (sendButton) {
+                sendButton.disabled = true;
             }
-            if (normalized.includes('图书馆') || normalized.includes('library')) {
-                return '这里藏着无数记忆，静静聆听它们的低语。';
+
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: chatHistory })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const content = data.content || '守护者暂时沉默了，请稍后再试。';
+                chatHistory.push({ role: 'assistant', content });
+                loadingMessage.innerHTML = `<strong>守护者:</strong> ${escapeHtml(content)}`;
+            } catch (error) {
+                loadingMessage.innerHTML = '<strong>守护者:</strong> 风把我的回答吹走了，请稍后再试。';
+            } finally {
+                if (sendButton) {
+                    sendButton.disabled = false;
+                }
+                const userInput = document.getElementById('userInput');
+                if (userInput) {
+                    userInput.focus();
+                }
+                const chatDisplay = document.getElementById('chatDisplay');
+                if (chatDisplay) {
+                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                }
             }
-            if (normalized.includes('你是谁') || normalized.includes('who are you')) {
-                return '我是这座图书馆的守护者，陪你走过每一个章节。';
-            }
-            if (normalized.includes('再见') || normalized.includes('bye')) {
-                return '愿你带着新的故事离开，随时欢迎回来。';
-            }
-            return '很有趣，我会记住你的话，但现在我还只是一只简单的守护者。';
         }
 
         function handleChatSubmission(event) {
@@ -698,11 +735,8 @@
             if (!userInput) return;
             const text = userInput.value.trim();
             if (!text) return;
-            addChatMessage('user', text);
             userInput.value = '';
-            setTimeout(() => {
-                addChatMessage('assistant', getReply(text));
-            }, 220);
+            handleChat(text);
         }
 
         function bindBookEvents() {
