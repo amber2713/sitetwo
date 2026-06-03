@@ -23,6 +23,7 @@
             background-image: url('./images/tushuguan.png');
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
@@ -108,7 +109,7 @@
             100% { transform: translateY(-100vh) translateX(80px); opacity: 0; }
         }
 
-        /* navbar - left icon removed */
+        /* navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -142,6 +143,7 @@
             max-width: 950px;
             margin: 0 auto;
             width: 100%;
+            position: relative;
         }
 
         /* quote box */
@@ -200,9 +202,6 @@
             filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.5));
             object-fit: contain;
         }
-        .clickable-book {
-            cursor: pointer;
-        }
 
         /* explore entrance (phase two) */
         .explore-icon {
@@ -249,59 +248,43 @@
             color: #b9aa86;
             background: rgba(10, 15, 30, 0.5);
             transition: all 0.3s;
-            margin-top: 30px;
+            margin-top: auto; /* Push footer to bottom safely */
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
+        /* 修改后的第二阶段左下角视图布局 */
         .second-view {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 24px;
-        }
-
-        .second-left {
-            width: 100%;
-            max-width: 460px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            align-items: center;
-        }
-
-        .second-image {
-            width: 100%;
+            position: fixed;
+            left: 30px;
+            bottom: 70px; /* 留出底部 footer 的空间 */
+            z-index: 10;
             max-width: 420px;
-            border-radius: 22px;
-            object-fit: contain;
-            box-shadow: 0 22px 46px rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255,255,255,0.02);
+            width: calc(100% - 60px);
         }
 
         .character-chat {
-            width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
+            flex-direction: row; /* 横向排列：Guomo在左，对话框在右 */
+            align-items: flex-end; /* 对齐底部 */
+            gap: 15px;
         }
 
+        /* 缩小至原大小 1/4 (约 75px) 的 Guomo 图像 */
         .guomo-character {
-            width: 100%;
-            max-width: 420px;
-            border-radius: 22px;
+            width: 75px; 
+            height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.28));
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.28));
             pointer-events: none;
+            flex-shrink: 0;
         }
 
+        /* 对话面板调整 */
         .ai-chat {
-            width: 100%;
-            max-width: 420px;
+            flex: 1;
             color: #4b1f2d;
             text-shadow: none;
         }
@@ -312,21 +295,21 @@
             border-radius: 18px;
             box-shadow: 0 14px 32px rgba(18, 12, 22, 0.18);
             backdrop-filter: blur(10px);
-            padding: 14px;
+            padding: 12px;
         }
 
         .ai-chat-messages {
-            min-height: 92px;
-            max-height: 180px;
+            min-height: 70px;
+            max-height: 140px;
             overflow-y: auto;
-            padding: 10px 8px 8px;
-            font-size: 0.96rem;
-            line-height: 1.5;
+            padding: 6px;
+            font-size: 0.9rem;
+            line-height: 1.4;
             text-align: left;
         }
 
         .ai-chat-message {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .ai-chat-message strong {
@@ -336,7 +319,7 @@
         .ai-chat-form {
             display: flex;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .ai-chat-input {
@@ -344,9 +327,9 @@
             min-width: 0;
             border: 1px solid rgba(184, 50, 86, 0.26);
             border-radius: 999px;
-            padding: 10px 14px;
+            padding: 6px 12px;
             font: inherit;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             color: #4b1f2d;
             outline: none;
             background: rgba(255, 255, 255, 0.9);
@@ -358,8 +341,8 @@
         }
 
         .ai-chat-button {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             border: 0;
             border-radius: 50%;
             background: #ff7894;
@@ -368,6 +351,7 @@
             display: grid;
             place-items: center;
             transition: transform 0.2s ease, background 0.2s ease;
+            flex-shrink: 0;
         }
 
         .ai-chat-button:hover {
@@ -391,6 +375,7 @@
             .quote { font-size: 1.25rem; }
             .quote-box { padding: 28px 20px; }
             .book-img { max-width: 180px; }
+            .second-view { left: 15px; bottom: 65px; width: calc(100% - 30px); }
         }
     </style>
 </head>
@@ -399,7 +384,6 @@
     <div class="particles" id="particles"></div>
 
     <div class="navbar">
-        <!-- empty placeholder to keep title centered (map icon removed) -->
         <div style="width: 60px;"></div>
         <h1 class="title">Library</h1>
         <div style="width: 60px;"></div>
@@ -411,35 +395,31 @@
         </div>
 
         <div id="secondView" class="second-view hidden">
-            <div class="second-left">
-                <div class="character-chat">
-                    <img class="guomo-character" src="./images/guomo_suit_cutout_clean.png" alt="Guomo" onerror="this.onerror=null; this.src='./images/guomo_suit_cutout_clean.png'">
-                    <div class="ai-chat" aria-label="AI chat">
-                        <div class="ai-chat-panel">
-                            <div class="ai-chat-messages" id="chatDisplay">
-                                <div class="ai-chat-message"><strong>守护者:</strong> 你好，欢迎来到图书馆，我会在这里陪你探秘。</div>
-                            </div>
-                            <form class="ai-chat-form" id="chatForm">
-                                <input class="ai-chat-input" id="userInput" type="text" placeholder="输入你的问题..." autocomplete="off">
-                                <button class="ai-chat-button" id="sendButton" type="submit" aria-label="发送消息">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                                        <path d="M3.5 20.5 21 12 3.5 3.5 6 10.5 14 12 6 13.5z" fill="currentColor"/>
-                                    </svg>
-                                </button>
-                            </form>
+            <div class="character-chat">
+                <img class="guomo-character" src="./images/guomo_suit_cutout_clean.png" alt="Guomo" onerror="this.onerror=null; this.src='./images/guomo_suit_cutout_clean.png'">
+                <div class="ai-chat" aria-label="AI chat">
+                    <div class="ai-chat-panel">
+                        <div class="ai-chat-messages" id="chatDisplay">
+                            <div class="ai-chat-message"><strong>守护者:</strong> 你好，欢迎来到图书馆，我会在这里陪你探秘。</div>
                         </div>
+                        <form class="ai-chat-form" id="chatForm">
+                            <input class="ai-chat-input" id="userInput" type="text" placeholder="输入你的问题..." autocomplete="off">
+                            <button class="ai-chat-button" id="sendButton" type="submit" aria-label="发送消息">
+                                <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                                    <path d="M3.5 20.5 21 12 3.5 3.5 6 10.5 14 12 6 13.5z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Phase One: closed book image (path /images/book) -->
-        <div id="bookContainer" class="book-wrapper clickable-book">
+        <div id="bookContainer" class="book-wrapper">
             <img id="closedBook" class="book-img" src="./images/book.jpg" alt="A dusty old book" 
                  onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Cpath fill=\'%23EBC485\' d=\'M30,25 L70,25 L70,75 L30,75 Z\'/%3E%3Cline x1=\'45\' y1=\'35\' x2=\'65\' y2=\'35\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Cline x1=\'45\' y1=\'47\' x2=\'60\' y2=\'47\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Ccircle cx=\'45\' cy=\'62\' r=\'5\' fill=\'%23DDAA66\'/%3E%3C/svg%3E';">
         </div>
 
-        <!-- Explore entrance (appears in phase two) -->
         <a href="https://amber2713.github.io/sitetwo/hall/" class="explore-icon" id="exploreIcon">
             <i class="fas fa-compass"></i>
         </a>
@@ -451,16 +431,11 @@
     </div>
 
     <script>
-        // ========== TWO-PHASE NARRATIVE ==========
-        // Phase 0: dilapidated library (initial)
-        // Phase 1: bright, transformed library
-        
         let currentPhase = 0;
         let typingTimeout = null;
         let isTypingInProgress = false;
         let phaseTransitionLock = false;
 
-        // DOM elements
         const monologueEl = document.getElementById('monologue');
         const bookContainer = document.getElementById('bookContainer');
         const secondView = document.getElementById('secondView');
@@ -468,9 +443,7 @@
         const exploreText = document.getElementById('exploreText');
         const bodyEl = document.body;
 
-        // ---------- ENGLISH TEXTS (fully localized) ----------
         const phase0Text = `I've come to the library of USTC, which in my memory holds all knowledge, but it looks so dilapidated now.\nHey, there's a book on the floor. Let me pick it up and see.`;
-        
         const phase1Text = `What was that book? It's gone. This library feels different now.`;
 
         const TYPING_SPEED = 55;
@@ -491,7 +464,6 @@
             }
         }
 
-        // Typewriter effect
         function typeTextToElement(text, onComplete, removeCursorWhenDone = true) {
             if (!monologueEl) return;
             abortTyping();
@@ -521,7 +493,7 @@
             typeChar();
         }
 
-        // ---------- ENTER BRIGHT LIBRARY (PHASE TWO) ----------
+        // ---------- 点击书本后触发进入第二阶段 ----------
         function enterBrightLibrary() {
             if (phaseTransitionLock) return;
             if (currentPhase === 1) return;
@@ -529,29 +501,26 @@
             phaseTransitionLock = true;
             currentPhase = 1;
             
-            // 1. Hide the closed book (phase one element)
+            // 1. 隐藏旧书
             if (bookContainer) {
-                bookContainer.style.display = 'none';
+                bookContainer.style.setProperty('display', 'none', 'important');
             }
             
-            // 2. Reveal the second view with image and dialog
+            // 2. 显示左下角的 Guomo 和对话框
             if (secondView) {
                 secondView.classList.remove('hidden');
             }
             
-            // 3. Apply light mode class (brighter ambiance)
+            // 3. 切换亮色模式
             bodyEl.classList.add('light-mode');
             
-            // 4. Clear previous text and type phase one text
             resetAndClearText();
             
-            // 5. Type the phase two monologue, then reveal explore button
             typeTextToElement(phase1Text, () => {
                 showExploreEntrance();
             }, true);
         }
         
-        // Fade in the explore button and text
         function showExploreEntrance() {
             if (!exploreIcon || !exploreText) return;
             exploreIcon.style.display = 'flex';
@@ -567,14 +536,11 @@
             }, 30);
         }
         
-        // ---------- PHASE ONE INITIALIZATION ----------
         function initPhaseOne() {
             currentPhase = 0;
             phaseTransitionLock = false;
-            // Remove light mode class (dark atmosphere)
             bodyEl.classList.remove('light-mode');
             
-            // Hide explore entrance if visible
             if (exploreIcon) {
                 exploreIcon.style.display = 'none';
                 exploreIcon.style.opacity = '0';
@@ -584,31 +550,27 @@
                 exploreText.style.opacity = '0';
             }
             
-            // Ensure book container is visible
             if (bookContainer) {
                 bookContainer.style.display = 'flex';
             }
             
-            // Hide second view until phase two
+            // 确保未点击书本前，左下角布局完全处于隐藏状态
             if (secondView) {
                 secondView.classList.add('hidden');
             }
             
-            // Reset text and start typing phase 0 monologue
             resetAndClearText();
             typeTextToElement(phase0Text, () => {
                 if (monologueEl) monologueEl.classList.remove('cursor');
             }, true);
         }
         
-        // Book click handler (transition to phase two)
         function onBookClickHandler(event) {
             if (currentPhase !== 0) return;
             if (phaseTransitionLock) return;
             enterBrightLibrary();
         }
         
-        // Create floating particles (decorative)
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             if (!particlesContainer) return;
@@ -629,7 +591,6 @@
             }
         }
         
-        // Robust image fallback handling (path /images/book)
         function enhanceBookImageFallback() {
             const bookImg = document.getElementById('closedBook');
             if (!bookImg) return;
@@ -638,30 +599,6 @@
                     bookImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B5A2B'/%3E%3Cpath fill='%23EBC485' d='M30,25 L70,25 L70,75 L30,75 Z'/%3E%3Cline x1='45' y1='35' x2='65' y2='35' stroke='%23443322' stroke-width='3'/%3E%3Cline x1='45' y1='47' x2='60' y2='47' stroke='%23443322' stroke-width='3'/%3E%3Ccircle cx='45' cy='62' r='5' fill='%23DDAA66'/%3E%3C/svg%3E";
                 }
             }
-        }
-        
-        // Gentle attempt to load real images without breaking path specification
-        function smartLoadBookImage() {
-            const img = document.getElementById('closedBook');
-            if (!img) return;
-            const originalPath = img.getAttribute('src');
-            if (originalPath && originalPath !== './images/book.jpg') return;
-            const testImg = new Image();
-            testImg.onload = function() {
-                if (img.src === './images/book.jpg') {
-                    img.src = './images/book.jpg';
-                }
-            };
-            testImg.onerror = function() {
-                const testImg2 = new Image();
-                testImg2.onload = function() {
-                    if (img.src === './images/book.jpg') {
-                        img.src = './images/book.jpg';
-                    }
-                };
-                testImg2.src = './images/book.jpg';
-            };
-            testImg.src = '/images/book.jpg';
         }
 
         const chatHistory = [];
@@ -742,7 +679,6 @@
         function bindBookEvents() {
             if (bookContainer) {
                 bookContainer.addEventListener('click', onBookClickHandler);
-                bookContainer.style.cursor = 'pointer';
             }
             const chatForm = document.getElementById('chatForm');
             if (chatForm) {
@@ -754,49 +690,22 @@
             if (typingTimeout) clearTimeout(typingTimeout);
         });
         
-        // Ensure phase consistency after potential refresh
-        function resetToPhaseOne() {
-            if (currentPhase === 1) {
-                bodyEl.classList.remove('light-mode');
-                currentPhase = 0;
-                phaseTransitionLock = false;
-                if (bookContainer) bookContainer.style.display = 'flex';
-                if (exploreIcon) exploreIcon.style.display = 'none';
-                if (exploreText) exploreText.style.display = 'none';
-                if (secondView) secondView.classList.add('hidden');
-                resetAndClearText();
-                typeTextToElement(phase0Text, () => {
-                    if (monologueEl) monologueEl.classList.remove('cursor');
-                }, true);
-            } else {
-                initPhaseOne();
-            }
-        }
-        
         function init() {
             createParticles();
             initPhaseOne();
             bindBookEvents();
             enhanceBookImageFallback();
-            smartLoadBookImage();
         }
         
         init();
         
-        // MutationObserver to ensure book stays hidden in phase two
+        // 确保在第2阶段旧书强制不被显示
         const observer = new MutationObserver(() => {
             if (currentPhase === 1 && bookContainer && bookContainer.style.display !== 'none') {
-                bookContainer.style.display = 'none';
+                bookContainer.style.setProperty('display', 'none', 'important');
             }
         });
         if (bookContainer) observer.observe(bookContainer, { attributes: true, attributeFilter: ['style'] });
-        
-        // Normal click behavior for explore link (preserves target URL)
-        if (exploreIcon) {
-            exploreIcon.addEventListener('click', (e) => {
-                // standard navigation, link unchanged
-            });
-        }
     </script>
 </body>
 </html>
