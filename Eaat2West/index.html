@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory of USTC - The Farewell</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Playfair Display', "Microsoft YaHei", serif;
+        }
+
+        body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 居中背景图 */
+            background: url('./images/tushuguan.png') center center / cover no-repeat;
+            position: relative;
+        }
+
+        /* 背景微暗遮罩，突出中央书本 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1;
+        }
+
+        /* ================= 翻开的书本容器 ================= */
+        .book-container {
+            position: relative;
+            z-index: 10;
+            width: 60vw; /* 占据页面接近一半的比例 */
+            height: 50vh;
+            background: #f4edd8;
+            border-radius: 4px;
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.5),
+                inset 0 0 40px rgba(93, 64, 55, 0.1);
+            display: flex;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInBook 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.5s;
+            transition: all 1s ease;
+        }
+
+        /* 书本消失的激活动态类 */
+        .book-container.fade-out {
+            opacity: 0 !important;
+            transform: scale(0.9) translateY(-20px) !important;
+            pointer-events: none;
+        }
+
+        /* 书本中缝阴影效果 */
+        .book-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to right, 
+                rgba(0,0,0,0.15) 0%, 
+                rgba(0,0,0,0.0) 10%, 
+                rgba(0,0,0,0.25) 50%, 
+                rgba(0,0,0,0.0) 90%, 
+                rgba(0,0,0,0.15) 100%);
+            z-index: 5;
+        }
+
+        /* 左右页面的通用样式 */
+        .page {
+            flex: 1;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 左侧页面：人物图片 */
+        .page-left {
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .girl-img {
+            max-height: 85%;
+            max-width: 85%;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.15));
+            animation: float 4s infinite ease-in-out;
+        }
+
+        /* 右侧页面：告别文字 */
+        .page-right {
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 50px;
+            padding-right: 50px;
+        }
+
+        .text-content {
+            font-size: 1.35rem;
+            color: #3E2723;
+            line-height: 2;
+            letter-spacing: 2px;
+            font-weight: 500;
+            border-right: 2px solid transparent; /* 模拟打字机光标 */
+        }
+
+        /* 打字时处于激活状态的光标闪烁 */
+        .text-content.typing {
+            border-right-color: #8D6E63;
+            animation: blink 0.75s step-end infinite;
+        }
+
+        /* ================= 后续出现的出发图标 ================= */
+        .depart-btn {
+            position: absolute;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* 出发图标显现的激活动态类 */
+        .depart-btn.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .icon-circle {
+            width: 95px;
+            height: 95px;
+            background: rgba(244, 237, 216, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            color: #5D4037;
+            border: 2px solid rgba(93, 64, 55, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: all 0.4s ease;
+        }
+
+        .depart-btn span {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #FFF8EF;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* 悬停交互动效 */
+        .depart-btn:hover .icon-circle {
+            transform: scale(1.12) rotate(15deg);
+            background: #8D6E63;
+            color: #FFF8EF;
+            border-color: #FFF8EF;
+            box-shadow: 0 0 25px rgba(255,255,255,0.4);
+        }
+
+        /* ================= 关键帧动画 ================= */
+        @keyframes fadeInBook {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent }
+            50% { border-color: #8D6E63; }
+        }
+
+        /* 移动端与小屏幕适配 */
+        @media (max-width: 1024px) {
+            .book-container { width: 85vw; height: 55vh; }
+            .text-content { font-size: 1.15rem; line-height: 1.8; }
+        }
+        @media (max-width: 650px) {
+            .book-container { flex-direction: column; height: 75vh; }
+            .book-container::after { width: 100%; height: 30px; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.2), rgba(0,0,0,0.1)); }
+            .page-left { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); }
+            .girl-img { max-height: 75%; }
+            .page-right { padding: 25px; align-items: flex-start; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book-container" id="mainBook">
+        <div class="page page-left">
+            <img src="./images/guomo_suit_cutout_clean.png" alt="Guomo" class="girl-img">
+        </div>
+        <div class="page page-right">
+            <div class="text-content typing" id="typingTarget"></div>
+        </div>
+    </div>
+
+    <a href="https://github.com/amber2713/2ele/blob/main/ai-chat-app/public/index.html" class="depart-btn" id="departBtn">
+        <div class="icon-circle">
+            <i class="fas fa-compass"></i>
+        </div>
+        <span>出发</span>
+    </a>
+
+<script>
+    // 配置需要打印的完整台词（使用 <br> 处理换行，使排版更具文学感）
+    const lines = [
+        "很高兴还能够再见到你，",
+        "这次东区的旅行我很开心。",
+        "<br>", 
+        "去西区吧，",
+        "那里会有USTC的理智之魂。"
+    ];
+
+    const target = document.getElementById('typingTarget');
+    const book = document.getElementById('mainBook');
+    const departBtn = document.getElementById('departBtn');
+
+    let currentLine = 0;
+    let currentChar = 0;
+
+    // 页面加载完毕、书本淡入动画缓冲过后再启动打字机
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(startTyping, 1800); 
+    });
+
+    function startTyping() {
+        function type() {
+            // 所有文本输出完毕后的处理逻辑
+            if (currentLine >= lines.length) {
+                target.classList.remove('typing'); // 关闭光标闪烁
+                
+                // 停留 1.5 秒供用户完整阅读，随后让书本消失并展示出发图标
+                setTimeout(() => {
+                    book.classList.add('fade-out');
+                    
+                    // 书本淡出动画（1s）结束后，优雅地把出发按钮唤醒
+                    setTimeout(() => {
+                        departBtn.classList.add('show');
+                    }, 800);
+
+                }, 1500);
+                return;
+            }
+
+            let currentStr = lines[currentLine];
+
+            // 遇到换行占位符直接渲染并跳到下一行
+            if (currentStr === "<br>") {
+                target.innerHTML += "<br>";
+                currentLine++;
+                currentChar = 0;
+                setTimeout(type, 400); // 换行时稍微停顿一下，节奏更好
+                return;
+            }
+
+            // 逐字输出
+            if (currentChar < currentStr.length) {
+                target.innerHTML += currentStr.charAt(currentChar);
+                currentChar++;
+                // 模拟真人打字速度微调（在 50ms 到 90ms 之间随机，更自然）
+                setTimeout(type, 50 + Math.random() * 40);
+            } else {
+                // 当前行结束，移至下一行
+                currentLine++;
+                currentChar = 0;
+                setTimeout(type, 600); // 句尾停顿感
+            }
+        }
+        type();
+    }
+</script>
+</body>
+</html>
