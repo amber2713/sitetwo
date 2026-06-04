@@ -219,39 +219,85 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.8s ease, visibility 0.8s ease;
+            background: rgba(10, 10, 10, 0.45);
+            backdrop-filter: blur(4px);
         }
         .open-book-overlay.active {
             opacity: 1;
             visibility: visible;
         }
-        .open-book-container {
+        .book-container {
             position: relative;
-            width: 60vw; /* 占据屏幕一半左右的大小 */
+            z-index: 10;
+            width: 60vw; /* 占据页面接近一半的比例 */
             max-width: 800px;
-            aspect-ratio: 4 / 3;
-            background-image: url('./images/open_book.png'); /* 请确保放置一张翻开的书的图片，下方附带防错兜底 */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
+            height: 50vh;
+            background: #f4edd8;
+            border-radius: 4px;
+            box-shadow:
+                0 15px 35px rgba(0,0,0,0.5),
+                inset 0 0 40px rgba(93, 64, 55, 0.1);
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 10%;
+            justify-content: center;
+            padding: 2.4rem 2rem;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInBook 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.5s;
+            transition: all 0.8s ease;
+        }
+        .open-book-overlay.active .book-container {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .book-container::before,
+        .book-container::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            bottom: 12px;
+            width: calc(50% - 22px);
+            background: linear-gradient(180deg, #fbf4e0 0%, #e9dcc0 100%);
+            border-radius: 0 18px 18px 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+        .book-container::before {
+            left: 16px;
+            border-radius: 18px 0 0 18px;
+        }
+        .book-container::after {
+            right: 16px;
+            border-radius: 0 18px 18px 0;
         }
         .open-book-text {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 100%;
             font-family: 'Noto Serif SC', 'Cambria', serif;
             font-size: 1.45rem;
-            line-height: 1.8;
+            line-height: 1.85;
             color: #2c1a0c; /* 书页暗色文字 */
             text-align: justify;
+            white-space: pre-wrap;
+            word-break: break-word;
             opacity: 0;
             transition: opacity 1s ease;
             text-shadow: none;
             font-weight: 600;
-            max-width: 85%;
         }
         .open-book-text.fade-in {
             opacity: 1;
+        }
+        @keyframes fadeInBook {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         /* explore entrance (phase two) */
@@ -431,7 +477,7 @@
             .guomo-character { width: 100px; }
             .ai-chat-panel { padding: 12px; }
             .ai-chat-messages { min-height: 90px; font-size: 0.95rem; }
-            .open-book-container { width: 90vw; padding: 15%; }
+            .book-container { width: 90vw; height: auto; min-height: 260px; padding: 18px; }
             .open-book-text { font-size: 1.1rem; }
         }
     </style>
@@ -483,13 +529,12 @@
     </div>
 
     <div class="open-book-overlay" id="openBookOverlay">
-        <div class="open-book-container" id="openBookContainer">
-            <div class="open-book-text" id="openBookText">
-                中国科学技术大学东校区，有着知识洋溢的图书馆，有着充满欢笑和回忆的郭沫若广场，有着天才的学院，有着静谧的咖啡馆，还有着粉红色的樱花大道，到处充满着浪漫的气息。
+            <div class="book-container" id="openBookContainer">
+                <div class="open-book-text" id="openBookText">
+                    中国科学技术大学东校区，有着知识洋溢的图书馆，有着充满欢笑和回忆的郭沫若广场，有着天才的学院，有着静谧的咖啡馆，还有着粉红色的樱花大道，到处充满着浪漫的气息。
+                </div>
             </div>
         </div>
-    </div>
-
     <div class="footer">
         <p>© 3099 · Library of Recollection</p>
     </div>
@@ -499,6 +544,7 @@
         let typingTimeout = null;
         let isTypingInProgress = false;
         let phaseTransitionLock = false;
+        let bookClickEnabled = false;
 
         const monologueEl = document.getElementById('monologue');
         const bookContainer = document.getElementById('bookContainer');
@@ -564,7 +610,7 @@
 
         // ---------- 点击旧书后触发新的中间过渡剧情 ----------
         function onBookClickHandler(event) {
-            if (currentPhase !== 0 || phaseTransitionLock) return;
+            if (currentPhase !== 0 || phaseTransitionLock || !bookClickEnabled) return;
             phaseTransitionLock = true;
 
             // 1. 隐藏地上的旧书
@@ -633,8 +679,9 @@
         function initPhaseOne() {
             currentPhase = 0;
             phaseTransitionLock = false;
+            bookClickEnabled = false;
             bodyEl.classList.remove('light-mode');
-            
+
             if (exploreIcon) {
                 exploreIcon.style.display = 'none';
                 exploreIcon.style.opacity = '0';
@@ -643,24 +690,31 @@
                 exploreText.style.display = 'none';
                 exploreText.style.opacity = '0';
             }
-            
+
             if (bookContainer) {
                 bookContainer.style.display = 'flex';
+                bookContainer.style.pointerEvents = 'none';
+                bookContainer.style.cursor = 'not-allowed';
             }
-            
+
             if (secondView) {
                 secondView.classList.add('hidden');
             }
 
             if (openBookOverlay) openBookOverlay.classList.remove('active');
             if (openBookText) openBookText.classList.remove('fade-in');
-            
+
             resetAndClearText();
             typeTextToElement(phase0Text, () => {
                 if (monologueEl) monologueEl.classList.remove('cursor');
+                bookClickEnabled = true;
+                if (bookContainer) {
+                    bookContainer.style.pointerEvents = 'auto';
+                    bookContainer.style.cursor = 'pointer';
+                }
             }, true);
         }
-        
+
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             if (!particlesContainer) return;
@@ -690,18 +744,6 @@
                 }
             }
 
-            // 对中间翻开的书进行SVG兜底渲染，防止本地没有open_book.png时界面空白
-            if (openBookContainer) {
-                const img = new Image();
-                img.src = './images/open_book.png';
-                img.onerror = () => {
-                    openBookContainer.style.backgroundImage = "none";
-                    openBookContainer.style.background = "rgba(247, 243, 222, 0.95)";
-                    openBookContainer.style.border = "2px solid #c8a070";
-                    openBookContainer.style.borderRadius = "20px";
-                    openBookContainer.style.boxShadow = "0 20px 50px rgba(0,0,0,0.6)";
-                };
-            }
         }
 
         const chatHistory = [];
