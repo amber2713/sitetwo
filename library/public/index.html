@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* enhances immersion, click remains functional */
+            user-select: none;
         }
 
         body {
@@ -38,80 +38,34 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             z-index: -2;
-            /* 初始状态（Guomo出来前）：较暗的光亮度 */
             filter: brightness(0.4); 
-            transition: filter 1.2s cubic-bezier(0.2, 0.9, 0.4, 1);
+            transition: filter 1.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* LIGHT MODE (Guomo 出现后的第二阶段) – 背景亮度大幅提升 */
-        body.light-mode {
-            color: #1e2a2e;
-        }
-        
-        /* 当触发亮色模式时，背景图的光亮度提高 */
+        /* 亮色模式（文字播放完毕后触发） */
         body.light-mode::before {
-            filter: brightness(0.95); /* 几乎完全明亮，同时保留一点细节舒适感 */
+            filter: brightness(0.95);
         }
 
-        body.light-mode .quote-box {
-            background: rgba(250, 248, 235, 0.85);
-            border: 1px solid rgba(180, 130, 70, 0.5);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        body.light-mode .quote {
-            color: #3e2c1a;
-            text-shadow: none;
-        }
-        body.light-mode .title {
-            background: linear-gradient(135deg, #8b5a2b, #c68b3c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        body.light-mode .navbar {
-            background: rgba(245, 240, 225, 0.6);
-            border-bottom: 1px solid rgba(150, 110, 60, 0.3);
-            backdrop-filter: blur(12px);
-        }
-        body.light-mode .footer {
-            color: #4a3b28;
-            background: rgba(245, 240, 225, 0.5);
-        }
-        body.light-mode .explore-icon {
-            background: rgba(160, 110, 50, 0.9);
-            border: 2px solid #ffdd99;
-            box-shadow: 0 0 18px rgba(200, 140, 40, 0.7);
-        }
-        body.light-mode .explore-icon i {
-            color: #fff3e0;
-        }
-        body.light-mode .explore-text {
-            color: #5a3a1a;
-            font-weight: bold;
-        }
-
-        /* floating particles */
+        /* 浮动微粒 */
         .particles {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             pointer-events: none;
         }
         .particle {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 235, 190, 0.7);
-            animation: float 18s infinite linear;
+            background: rgba(255, 235, 190, 0.5);
+            animation: floatParticle 18s infinite linear;
         }
-        @keyframes float {
-            0% { transform: translateY(0) translateX(0); opacity: 0.7; }
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 0.6; }
             100% { transform: translateY(-100vh) translateX(80px); opacity: 0; }
         }
 
-        /* navbar */
+        /* 导航栏 */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -121,7 +75,13 @@
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             z-index: 15;
+            transition: all 0.5s ease;
         }
+        body.light-mode .navbar {
+            background: rgba(245, 240, 225, 0.6);
+            border-bottom: 1px solid rgba(150, 110, 60, 0.3);
+        }
+
         .title {
             font-size: 2.7rem;
             letter-spacing: 2px;
@@ -130,10 +90,15 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 600;
-            text-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        body.light-mode .title {
+            background: linear-gradient(135deg, #8b5a2b, #c68b3c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* main container */
+        /* 主容器 */
         .container {
             flex: 1;
             display: flex;
@@ -142,258 +107,215 @@
             justify-content: center;
             padding: 30px 24px 60px;
             text-align: center;
-            max-width: 950px;
-            margin: 0 auto;
             width: 100%;
             position: relative;
         }
 
-        /* quote box */
+        /* 顶部的提示独白框（第一阶段使用） */
         .quote-box {
             background: rgba(20, 25, 45, 0.7);
             border-radius: 28px;
-            padding: 38px 32px;
-            margin: 20px 0 30px;
-            border: 1px solid rgba(200, 170, 110, 0.6);
+            padding: 25px 32px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(200, 170, 110, 0.4);
+            max-width: 850px;
             width: 100%;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             backdrop-filter: blur(3px);
-            transition: all 0.4s;
+            transition: all 0.5s ease;
         }
         .quote {
-            font-size: 1.55rem;
-            line-height: 1.65;
+            font-size: 1.35rem;
+            line-height: 1.6;
             color: #f3e7ce;
             font-style: italic;
-            white-space: pre-wrap;
-            font-weight: 500;
-            transition: color 0.2s;
         }
 
-        /* blinking cursor for typing */
-        .cursor::after {
-            content: '|';
-            animation: blink 1s infinite;
-            color: #dbb879;
-            margin-left: 4px;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        /* book container – phase one */
+        /* 第一阶段：地上的旧书 */
         .book-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0 30px;
+            margin-top: 20px;
             cursor: pointer;
             transition: transform 0.25s ease, filter 0.2s;
         }
         .book-wrapper:hover {
-            transform: scale(1.02);
-            filter: drop-shadow(0 0 12px rgba(230, 200, 120, 0.5));
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(230, 200, 120, 0.6));
         }
         .book-img {
-            max-width: 240px;
-            width: 70%;
+            max-width: 220px;
+            width: 65%;
             height: auto;
-            border-radius: 16px;
-            transition: all 0.2s;
-            filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.5));
-            object-fit: contain;
+            border-radius: 12px;
+            filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.6));
         }
 
-        /* 【新增】翻开的书本及过渡文字大遮罩层 */
-        .open-book-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        .open-book-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* ==================== 【新增】虚拟翻开书本样式 ==================== */
         .open-book-container {
-            position: relative;
-            width: 60vw; /* 占据屏幕一半左右的大小 */
-            max-width: 800px;
-            aspect-ratio: 4 / 3;
-            background-image: url('./images/open_book.png'); /* 请确保放置一张翻开的书的图片，下方附带防错兜底 */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 58vw;
+            height: 48vh;
+            background: #f4edd8;
+            border-radius: 6px;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6), inset 0 0 40px rgba(93, 64, 55, 0.15);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10%;
-        }
-        .open-book-text {
-            font-family: 'Noto Serif SC', 'Cambria', serif;
-            font-size: 1.45rem;
-            line-height: 1.8;
-            color: #2c1a0c; /* 书页暗色文字 */
-            text-align: justify;
+            z-index: 100;
             opacity: 0;
-            transition: opacity 1s ease;
-            text-shadow: none;
-            font-weight: 600;
-            max-width: 85%;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .open-book-text.fade-in {
+        .open-book-container.show {
             opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
         }
-
-        /* explore entrance (phase two) */
-        .explore-icon {
-            display: none; 
-            align-items: center;
+        .open-book-container.fade-out {
+            opacity: 0;
+            transform: translate(-50%, -52%) scale(0.95);
+            pointer-events: none;
+        }
+        /* 书本中缝立体阴影 */
+        .open-book-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 35px; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.0) 15%, rgba(0,0,0,0.22) 50%, rgba(0,0,0,0.0) 85%, rgba(0,0,0,0.1) 100%);
+            z-index: 5;
+        }
+        .book-page {
+            flex: 1;
+            height: 100%;
+            padding: 35px 45px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            width: 110px;
-            height: 110px;
-            background: rgba(190, 150, 85, 0.85);
-            border-radius: 60px;
-            border: 2px solid #e7c389;
-            cursor: pointer;
-            text-decoration: none;
-            margin-top: 20px;
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            backdrop-filter: blur(2px);
+            position: relative;
         }
-        .explore-icon i {
-            font-size: 48px;
-            color: #2b1e0c;
+        .book-page-left {
+            border-right: 1px solid rgba(0,0,0,0.05);
+            align-items: center;
         }
-        .explore-icon:hover {
-            transform: scale(1.08);
-            background: #c99f5e;
-            box-shadow: 0 0 20px rgba(230, 190, 100, 0.8);
+        .book-page-left i {
+            font-size: 5rem;
+            color: rgba(93, 64, 55, 0.15);
+            animation: floatIcon 4s infinite ease-in-out;
         }
-        .explore-text {
-            display: none;
-            margin-top: 14px;
-            font-size: 1.25rem;
-            letter-spacing: 1px;
-            color: #ecdca8;
-            font-weight: 600;
-            background: rgba(0,0,0,0.3);
-            padding: 4px 14px;
-            border-radius: 30px;
-            backdrop-filter: blur(2px);
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-
-        .footer {
-            text-align: center;
-            padding: 18px;
-            font-size: 0.85rem;
-            color: #b9aa86;
-            background: rgba(10, 15, 30, 0.5);
-            transition: all 0.3s;
-            margin-top: auto; /* Push footer to bottom safely */
+        .book-page-right {
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding-left: 35px;
+        }
+        /* 书本打字文本样式 */
+        .book-text-content {
+            font-family: 'Playfair Display', "Microsoft YaHei", serif;
+            font-size: 1.22rem;
+            color: #3E2723;
+            line-height: 1.9;
+            letter-spacing: 2px;
+            font-weight: 500;
+            text-align: left;
+            border-right: 2px solid transparent;
+        }
+        .book-text-content.typing {
+            border-right-color: #8D6E63;
+            animation: cursorBlink 0.75s step-end infinite;
+        }
+        @keyframes cursorBlink {
+            from, to { border-color: transparent }
+            50% { border-color: #8D6E63; }
         }
 
-        .hidden {
-            display: none !important;
-        }
-
-        /* 【核心修改】大幅增大了左下角视图布局（变成原本的 2.5 倍大小） */
+        /* ==================== 【重点修改】Guomo 立绘与对话框增大 2~3 倍 ==================== */
         .second-view {
             position: fixed;
-            left: 40px;
-            bottom: 80px; 
-            z-index: 10;
-            max-width: 750px; /* 从 420px 扩大 */
-            width: calc(100% - 80px);
+            left: 50px;
+            bottom: 60px; 
+            z-index: 20;
+            width: 780px; /* 大幅拉宽容器以容纳巨型对话框 */
+            max-width: 90vw;
+            transition: all 0.8s ease;
         }
-
         .character-chat {
             display: flex;
-            flex-direction: row; 
-            align-items: flex-end; 
-            gap: 25px; /* 增大间距 */
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 30px; /* 增大间距 */
         }
-
         .guomo-character {
-            width: 180px;  /* 从 75px 扩大至 2.4 倍 */
+            width: 210px; /* 相比之前的75px，放大了近3倍 */
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.4));
+            filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.35));
             pointer-events: none;
             flex-shrink: 0;
+            animation: guomoFloat 5s infinite ease-in-out;
         }
-
-        /* 对话面板大尺寸化 */
+        @keyframes guomoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
         .ai-chat {
             flex: 1;
             color: #4b1f2d;
             text-shadow: none;
         }
-
         .ai-chat-panel {
-            background: rgba(255, 250, 252, 0.96);
-            border: 1.5px solid rgba(190, 130, 145, 0.45);
-            border-radius: 24px; /* 稍加圆润 */
-            box-shadow: 0 18px 45px rgba(18, 12, 22, 0.25);
-            backdrop-filter: blur(12px);
-            padding: 22px; /* 扩大内边距 */
+            background: rgba(255, 250, 252, 0.95);
+            border: 1px solid rgba(190, 130, 145, 0.4);
+            border-radius: 24px; /* 边缘更圆润大方 */
+            box-shadow: 0 20px 45px rgba(18, 12, 22, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 22px; /* 增加内边距 */
         }
-
         .ai-chat-messages {
-            min-height: 140px; /* 高度翻倍 */
+            min-height: 150px; /* 对话高度扩充多倍 */
             max-height: 260px;
             overflow-y: auto;
-            padding: 8px;
-            font-size: 1.15rem; /* 字号增大 */
+            padding: 5px;
+            font-size: 1.15rem; /* 字号显著放大 */
             line-height: 1.6;
             text-align: left;
         }
-
         .ai-chat-message {
             margin-bottom: 12px;
         }
-
         .ai-chat-message strong {
             color: #b83256;
             font-size: 1.2rem;
         }
-
         .ai-chat-form {
             display: flex;
             gap: 12px;
-            margin-top: 14px;
+            margin-top: 15px;
         }
-
         .ai-chat-input {
             flex: 1;
             min-width: 0;
-            border: 1.5px solid rgba(184, 50, 86, 0.35);
+            border: 1px solid rgba(184, 50, 86, 0.3);
             border-radius: 999px;
-            padding: 10px 20px; /* 增大输入框手感 */
+            padding: 12px 24px; /* 输入框明显变大 */
             font: inherit;
             font-size: 1.05rem;
             color: #4b1f2d;
             outline: none;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
         }
-
         .ai-chat-input:focus {
             border-color: #ff7894;
-            box-shadow: 0 0 0 4px rgba(255, 120, 148, 0.25);
+            box-shadow: 0 0 0 4px rgba(255, 120, 148, 0.2);
         }
-
         .ai-chat-button {
-            width: 44px; /* 从 32px 扩大 */
-            height: 44px;
+            width: 48px; /* 按钮放大 */
+            height: 48px;
             border: 0;
             border-radius: 50%;
             background: #ff7894;
@@ -404,35 +326,90 @@
             transition: transform 0.2s ease, background 0.2s ease;
             flex-shrink: 0;
         }
-
         .ai-chat-button svg {
-            width: 18px; /* 放大图标 */
-            height: 18px;
+            width: 18px; height: 18px; /* 图标等比放大 */
         }
-
         .ai-chat-button:hover {
-            transform: translateY(-2px);
+            transform: scale(1.05);
             background: #e85f7d;
         }
 
-        .ai-chat-button:disabled {
-            cursor: wait;
-            opacity: 0.7;
-            transform: none;
+        /* 后续出现的出发图标 */
+        .explore-icon {
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            width: 110px;
+            height: 110px;
+            background: rgba(190, 150, 85, 0.9);
+            border-radius: 50%;
+            border: 2px solid #e7c389;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+        .explore-icon i {
+            font-size: 44px;
+            color: #2b1e0c;
+        }
+        .explore-icon:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: #c99f5e;
+            box-shadow: 0 0 25px rgba(230, 190, 100, 0.8);
+        }
+        .explore-text {
+            display: none;
+            margin-top: 14px;
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+            color: #ecdca8;
+            font-weight: 600;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 18px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+            z-index: 10;
         }
 
-        body.light-mode .ai-chat-panel {
-            background: rgba(255, 255, 255, 0.98);
-            border-color: rgba(180, 130, 140, 0.45);
+        .footer {
+            text-align: center;
+            padding: 18px;
+            font-size: 0.85rem;
+            color: #b9aa86;
+            background: rgba(10, 15, 30, 0.5);
+            transition: all 0.3s;
+            margin-top: auto;
+            z-index: 5;
+        }
+        body.light-mode .footer {
+            color: #4a3b28;
+            background: rgba(245, 240, 225, 0.5);
         }
 
-        @media (max-width: 768px) {
-            .second-view { left: 15px; bottom: 65px; width: calc(100% - 30px); }
-            .guomo-character { width: 100px; }
-            .ai-chat-panel { padding: 12px; }
-            .ai-chat-messages { min-height: 90px; font-size: 0.95rem; }
-            .open-book-container { width: 90vw; padding: 15%; }
-            .open-book-text { font-size: 1.1rem; }
+        .hidden {
+            display: none !important;
+        }
+
+        /* 移动端与小屏幕适配 */
+        @media (max-width: 1024px) {
+            .open-book-container { width: 85vw; height: 50vh; }
+            .second-view { width: 90vw; left: 5vw; bottom: 80px; }
+            .guomo-character { width: 140px; }
+        }
+        @media (max-width: 650px) {
+            .title { font-size: 2rem; }
+            .open-book-container { flex-direction: column; height: 65vh; width: 85vw; }
+            .book-page-left { display: none; }
+            .book-page-right { padding: 25px; }
+            .book-text-content { font-size: 1.05rem; line-height: 1.7; }
+            .character-chat { gap: 15px; }
+            .guomo-character { width: 95px; }
+            .ai-chat-messages { min-height: 110px; font-size: 0.95rem; }
+            .ai-chat-input { padding: 8px 16px; font-size: 0.9rem; }
+            .ai-chat-button { width: 38px; height: 38px; }
         }
     </style>
 </head>
@@ -446,8 +423,22 @@
     </div>
 
     <div class="container">
-        <div class="quote-box">
+        <div class="quote-box" id="guideBox">
             <p class="quote" id="monologue"></p>
+        </div>
+
+        <div id="bookContainer" class="book-wrapper">
+            <img id="closedBook" class="book-img" src="./images/book.jpg" alt="A dusty old book" 
+                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Cpath fill=\'%23EBC485\' d=\'M30,25 L70,25 L70,75 L30,75 Z\'/%3E%3Cline x1=\'45\' y1=\'35\' x2=\'65\' y2=\'35\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Cline x1=\'45\' y1=\'47\' x2=\'60\' y2=\'47\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Ccircle cx=\'45\' cy=\'62\' r=\'5\' fill=\'%23DDAA66\'/%3E%3C/svg%3E';">
+        </div>
+
+        <div class="open-book-container" id="openBook">
+            <div class="book-page book-page-left">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="book-page book-page-right">
+                <div class="book-text-content typing" id="bookTypingTarget"></div>
+            </div>
         </div>
 
         <div id="secondView" class="second-view hidden">
@@ -456,13 +447,13 @@
                 <div class="ai-chat" aria-label="AI chat">
                     <div class="ai-chat-panel">
                         <div class="ai-chat-messages" id="chatDisplay">
-                            <div class="ai-chat-message"><strong>守护者:</strong> 你好，欢迎来到图书馆，我会在这里陪你探秘。</div>
+                            <div class="ai-chat-message"><strong>守护者:</strong> 你好，欢迎来到中国科学技术大学东区图书馆，我会在这里陪你探秘。</div>
                         </div>
                         <form class="ai-chat-form" id="chatForm">
                             <input class="ai-chat-input" id="userInput" type="text" placeholder="输入你的问题..." autocomplete="off">
                             <button class="ai-chat-button" id="sendButton" type="submit" aria-label="发送消息">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M3.5 20.5 21 12 3.5 3.5 6 10.5 14 12 6 13.5z" fill="currentColor"/>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3.5 20.5 21 12 3.5 3.5 6 10.5 14 12 6 13.5z"/>
                                 </svg>
                             </button>
                         </form>
@@ -471,23 +462,10 @@
             </div>
         </div>
 
-        <div id="bookContainer" class="book-wrapper">
-            <img id="closedBook" class="book-img" src="./images/book.jpg" alt="A dusty old book" 
-                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%238B5A2B\'/%3E%3Cpath fill=\'%23EBC485\' d=\'M30,25 L70,25 L70,75 L30,75 Z\'/%3E%3Cline x1=\'45\' y1=\'35\' x2=\'65\' y2=\'35\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Cline x1=\'45\' y1=\'47\' x2=\'60\' y2=\'47\' stroke=\'%23443322\' stroke-width=\'3\'/%3E%3Ccircle cx=\'45\' cy=\'62\' r=\'5\' fill=\'%23DDAA66\'/%3E%3C/svg%3E';">
-        </div>
-
         <a href="https://amber2713.github.io/sitetwo/hall/" class="explore-icon" id="exploreIcon">
             <i class="fas fa-compass"></i>
         </a>
         <div class="explore-text" id="exploreText">Explore the Library</div>
-    </div>
-
-    <div class="open-book-overlay" id="openBookOverlay">
-        <div class="open-book-container" id="openBookContainer">
-            <div class="open-book-text" id="openBookText">
-                中国科学技术大学东校区，有着知识洋溢的图书馆，有着充满欢笑和回忆的郭沫若广场，有着天才的学院，有着静谧的咖啡馆，还有着粉红色的樱花大道，到处充满着浪漫的气息。
-            </div>
-        </div>
     </div>
 
     <div class="footer">
@@ -501,21 +479,22 @@
         let phaseTransitionLock = false;
 
         const monologueEl = document.getElementById('monologue');
+        const guideBox = document.getElementById('guideBox');
         const bookContainer = document.getElementById('bookContainer');
+        const openBook = document.getElementById('openBook');
+        const bookTypingTarget = document.getElementById('bookTypingTarget');
         const secondView = document.getElementById('secondView');
         const exploreIcon = document.getElementById('exploreIcon');
         const exploreText = document.getElementById('exploreText');
         const bodyEl = document.body;
 
-        // 获取新增的过渡元素
-        const openBookOverlay = document.getElementById('openBookOverlay');
-        const openBookContainer = document.getElementById('openBookContainer');
-        const openBookText = document.getElementById('openBookText');
-
+        // 台词内容
         const phase0Text = `I've come to the library of USTC, which in my memory holds all knowledge, but it looks so dilapidated now.\nHey, there's a book on the floor. Let me pick it up and see.`;
-        const phase1Text = `What was that book? It's gone. This library feels different now.`;
+        
+        // 核心新增：翻开书上要打印的完整长句
+        const ustcDescriptionText = "中国科学技术大学东校区，有着知识洋溢的图书馆，有着充满欢笑和回忆的郭沫若广场，有着天才的学院，有着静谧的咖啡馆，还有着粉红色的樱花大道，到处充满着浪漫的气息。";
 
-        const TYPING_SPEED = 55;
+        const TYPING_SPEED = 65;
 
         function abortTyping() {
             if (typingTimeout) {
@@ -525,94 +504,94 @@
             isTypingInProgress = false;
         }
 
-        function resetAndClearText() {
-            abortTyping();
-            if (monologueEl) {
-                monologueEl.textContent = '';
-                monologueEl.classList.remove('cursor');
-            }
-        }
-
-        function typeTextToElement(text, onComplete, removeCursorWhenDone = true) {
+        // 第一阶段的引导字打印
+        function typeTextToElement(text, onComplete) {
             if (!monologueEl) return;
             abortTyping();
             monologueEl.textContent = '';
             monologueEl.classList.add('cursor');
             
             let idx = 0;
-            const len = text.length;
-            
             function typeChar() {
-                if (idx < len) {
+                if (idx < text.length) {
                     monologueEl.textContent += text[idx];
                     idx++;
-                    typingTimeout = setTimeout(typeChar, TYPING_SPEED);
+                    typingTimeout = setTimeout(typeChar, 40);
                 } else {
-                    if (removeCursorWhenDone) {
-                        monologueEl.classList.remove('cursor');
-                    }
+                    monologueEl.classList.remove('cursor');
                     isTypingInProgress = false;
                     typingTimeout = null;
-                    if (onComplete && typeof onComplete === 'function') {
-                        onComplete();
-                    }
+                    if (onComplete) onComplete();
                 }
             }
             isTypingInProgress = true;
             typeChar();
         }
 
-        // ---------- 点击旧书后触发新的中间过渡剧情 ----------
-        function onBookClickHandler(event) {
+        // ==================== 【全新核心交互控制】 ====================
+        function onBookClickHandler() {
             if (currentPhase !== 0 || phaseTransitionLock) return;
             phaseTransitionLock = true;
 
-            // 1. 隐藏地上的旧书
-            if (bookContainer) {
-                bookContainer.style.setProperty('display', 'none', 'important');
-            }
-
-            // 2. 展现翻开的书（淡入特效），此时背景依然维持 filter: brightness(0.4) 较暗状态
-            openBookOverlay.classList.add('active');
-
-            // 3. 稍做延迟让书本展开后，再使文字平滑浮现 (fade-in)
+            // 1. 先让原先顶部的引导提示框和地上的旧书优雅淡出隐去
+            guideBox.style.opacity = '0';
+            bookContainer.style.opacity = '0';
+            
             setTimeout(() => {
-                openBookText.classList.add('fade-in');
+                guideBox.classList.add('hidden');
+                bookContainer.style.setProperty('display', 'none', 'important');
                 
-                // 4. 文字停留展示 4.5 秒后，自动执行隐去与进入光亮图书馆阶段
-                setTimeout(() => {
-                    // 文字与翻开的书执行“隐去”特效
-                    openBookText.classList.remove('fade-in');
-                    openBookOverlay.classList.remove('active');
-
-                    // 5. 待隐去动画彻底结束后 (800ms)，正式解锁并渲染 Guomo 视角
-                    setTimeout(() => {
-                        enterBrightLibrary();
-                    }, 800);
-
-                }, 4500); 
-
-            }, 400);
+                // 2. 唤醒并淡入中间那本“大翻开书本”组件（此时背景依旧保持偏暗）
+                openBook.classList.add('show');
+                
+                // 3. 缓缓冲过淡入动画后，开始在翻开的书页上打印那段浪漫唯美的 USTC 台词
+                setTimeout(startBookTyping, 900);
+            }, 500);
         }
 
-        // ---------- 最终阶段：进入明亮的图书馆 ----------
-        function enterBrightLibrary() {
-            currentPhase = 1;
+        function startBookTyping() {
+            bookTypingTarget.textContent = '';
+            bookTypingTarget.classList.add('typing');
             
-            // 显示左下角放大的 Guomo 形象和宽敞的聊天面板
-            if (secondView) {
-                secondView.classList.remove('hidden');
+            let idx = 0;
+            function type() {
+                if (idx < ustcDescriptionText.length) {
+                    bookTypingTarget.textContent += ustcDescriptionText.charAt(idx);
+                    idx++;
+                    // 模拟更天然的真人打字节奏
+                    typingTimeout = setTimeout(type, TYPING_SPEED + Math.random() * 30);
+                } else {
+                    // 文字播放完成，关掉打字机光标
+                    bookTypingTarget.classList.remove('typing');
+                    
+                    // 预留 2.2 秒供用户细细品味阅读这段文字，随后自动隐去书本、切入终极明亮场景
+                    setTimeout(() => {
+                        openBook.classList.remove('show');
+                        openBook.classList.add('fade-out');
+                        
+                        // 书本淡出动画完结后，瞬间切入亮色模式，并释放巨大的 Guomo 立绘和聊天面板
+                        setTimeout(enterFinalBrightLibrary, 1000);
+                    }, 2200);
+                }
             }
-            
-            // 切换亮色模式（触发 CSS 里的背景 brightness 提升至 0.95）
+            type();
+        }
+
+        function enterFinalBrightLibrary() {
+            currentPhase = 1;
+            openBook.classList.add('hidden');
+
+            // 1. 激活亮色模式控制（背景光亮度大幅提升至 0.95）
             bodyEl.classList.add('light-mode');
-            
-            resetAndClearText();
-            
-            typeTextToElement(phase1Text, () => {
-                showExploreEntrance();
-                phaseTransitionLock = false; // 整个流程顺利完毕，解锁
-            }, true);
+
+            // 2. 闪亮登场：展示放大 2~3 倍的 Guomo 形象和巨型 AI 聊天区域
+            secondView.classList.remove('hidden');
+            secondView.style.opacity = '0';
+            secondView.style.transition = 'opacity 1s ease';
+            setTimeout(() => { secondView.style.opacity = '1'; }, 50);
+
+            // 3. 同步淡入指南针探险大按钮
+            showExploreEntrance();
         }
         
         function showExploreEntrance() {
@@ -621,98 +600,40 @@
             exploreText.style.display = 'block';
             exploreIcon.style.opacity = '0';
             exploreText.style.opacity = '0';
-            exploreIcon.style.transition = 'opacity 0.9s ease';
-            exploreText.style.transition = 'opacity 0.9s ease';
+            exploreIcon.style.transition = 'opacity 1.2s ease';
+            exploreText.style.transition = 'opacity 1.2s ease';
             
             setTimeout(() => {
                 exploreIcon.style.opacity = '1';
                 exploreText.style.opacity = '1';
-            }, 30);
+            }, 100);
         }
         
         function initPhaseOne() {
             currentPhase = 0;
             phaseTransitionLock = false;
             bodyEl.classList.remove('light-mode');
-            
-            if (exploreIcon) {
-                exploreIcon.style.display = 'none';
-                exploreIcon.style.opacity = '0';
-            }
-            if (exploreText) {
-                exploreText.style.display = 'none';
-                exploreText.style.opacity = '0';
-            }
+            guideBox.classList.remove('hidden');
+            guideBox.style.opacity = '1';
             
             if (bookContainer) {
                 bookContainer.style.display = 'flex';
+                bookContainer.style.opacity = '1';
             }
+            openBook.classList.remove('show', 'fade-out', 'hidden');
+            secondView.classList.add('hidden');
             
-            if (secondView) {
-                secondView.classList.add('hidden');
-            }
-
-            if (openBookOverlay) openBookOverlay.classList.remove('active');
-            if (openBookText) openBookText.classList.remove('fade-in');
+            if (exploreIcon) exploreIcon.style.display = 'none';
+            if (exploreText) exploreText.style.display = 'none';
             
-            resetAndClearText();
-            typeTextToElement(phase0Text, () => {
-                if (monologueEl) monologueEl.classList.remove('cursor');
-            }, true);
-        }
-        
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            if (!particlesContainer) return;
-            particlesContainer.innerHTML = '';
-            const particleCount = 55;
-            for (let i = 0; i < particleCount; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                const size = Math.random() * 6 + 1.5;
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-                p.style.left = `${Math.random() * 100}%`;
-                p.style.top = `${Math.random() * 100}%`;
-                p.style.animationDuration = `${12 + Math.random() * 18}s`;
-                p.style.animationDelay = `${Math.random() * 15}s`;
-                p.style.opacity = `${0.3 + Math.random() * 0.5}`;
-                particlesContainer.appendChild(p);
-            }
-        }
-        
-        function enhanceBookImageFallback() {
-            const bookImg = document.getElementById('closedBook');
-            if (!bookImg) return;
-            if (bookImg.complete && (bookImg.naturalWidth === 0 || bookImg.naturalHeight === 0)) {
-                if (!bookImg.src.includes('data:image/svg')) {
-                    bookImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B5A2B'/%3E%3Cpath fill='%23EBC485' d='M30,25 L70,25 L70,75 L30,75 Z'/%3E%3Cline x1='45' y1='35' x2='65' y2='35' stroke='%23443322' stroke-width='3'/%3E%3Cline x1='45' y1='47' x2='60' y2='47' stroke='%23443322' stroke-width='3'/%3E%3Ccircle cx='45' cy='62' r='5' fill='%23DDAA66'/%3E%3C/svg%3E";
-                }
-            }
-
-            // 对中间翻开的书进行SVG兜底渲染，防止本地没有open_book.png时界面空白
-            if (openBookContainer) {
-                const img = new Image();
-                img.src = './images/open_book.png';
-                img.onerror = () => {
-                    openBookContainer.style.backgroundImage = "none";
-                    openBookContainer.style.background = "rgba(247, 243, 222, 0.95)";
-                    openBookContainer.style.border = "2px solid #c8a070";
-                    openBookContainer.style.borderRadius = "20px";
-                    openBookContainer.style.boxShadow = "0 20px 50px rgba(0,0,0,0.6)";
-                };
-            }
+            typeTextToElement(phase0Text);
         }
 
+        // ==================== 以下为原项目的 AI Chat API 对接与微粒逻辑 ====================
         const chatHistory = [];
 
         function escapeHtml(value) {
-            return value
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+            return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         function addChatMessage(role, content) {
@@ -733,9 +654,7 @@
 
             const loadingMessage = addChatMessage('assistant', '守护者正在思考...');
             const sendButton = document.getElementById('sendButton');
-            if (sendButton) {
-                sendButton.disabled = true;
-            }
+            if (sendButton) sendButton.disabled = true;
 
             try {
                 const response = await fetch('/.netlify/functions/chat', {
@@ -743,11 +662,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ messages: chatHistory })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Request failed: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`Status: ${response.status}`);
                 const data = await response.json();
                 const content = data.content || '守护者暂时沉默了，请稍后再试。';
                 chatHistory.push({ role: 'assistant', content });
@@ -755,17 +670,11 @@
             } catch (error) {
                 loadingMessage.innerHTML = '<strong>守护者:</strong> 风把我的回答吹走了，请稍后再试。';
             } finally {
-                if (sendButton) {
-                    sendButton.disabled = false;
-                }
+                if (sendButton) sendButton.disabled = false;
                 const userInput = document.getElementById('userInput');
-                if (userInput) {
-                    userInput.focus();
-                }
+                if (userInput) userInput.focus();
                 const chatDisplay = document.getElementById('chatDisplay');
-                if (chatDisplay) {
-                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
-                }
+                if (chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
             }
         }
 
@@ -779,35 +688,38 @@
             handleChat(text);
         }
 
-        function bindBookEvents() {
-            if (bookContainer) {
-                bookContainer.addEventListener('click', onBookClickHandler);
-            }
-            const chatForm = document.getElementById('chatForm');
-            if (chatForm) {
-                chatForm.addEventListener('submit', handleChatSubmission);
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            particlesContainer.innerHTML = '';
+            for (let i = 0; i < 45; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 5 + 1.5;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animationDuration = `${12 + Math.random() * 15}s`;
+                p.style.animationDelay = `${Math.random() * 10s}`;
+                particlesContainer.appendChild(p);
             }
         }
-        
-        window.addEventListener('beforeunload', () => {
-            if (typingTimeout) clearTimeout(typingTimeout);
-        });
+
+        function bindEvents() {
+            if (bookContainer) bookContainer.addEventListener('click', onBookClickHandler);
+            const chatForm = document.getElementById('chatForm');
+            if (chatForm) chatForm.addEventListener('submit', handleChatSubmission);
+        }
+
+        window.addEventListener('beforeunload', () => { if (typingTimeout) clearTimeout(typingTimeout); });
         
         function init() {
             createParticles();
             initPhaseOne();
-            bindBookEvents();
-            enhanceBookImageFallback();
+            bindEvents();
         }
-        
         init();
-        
-        const observer = new MutationObserver(() => {
-            if (currentPhase === 1 && bookContainer && bookContainer.style.display !== 'none') {
-                bookContainer.style.setProperty('display', 'none', 'important');
-            }
-        });
-        if (bookContainer) observer.observe(bookContainer, { attributes: true, attributeFilter: ['style'] });
     </script>
 </body>
 </html>
