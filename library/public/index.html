@@ -25,9 +25,6 @@
             transition: color 0.4s ease;
         }
 
-        /* 【核心修改】去掉原先的遮罩层，改用 body 的伪元素承载背景图。
-           这样可以单独用 filter: brightness() 调节背景亮度，而完全不破坏背景图的质感，也不会影响文字。
-        */
         body::before {
             content: "";
             position: fixed;
@@ -208,6 +205,55 @@
             object-fit: contain;
         }
 
+        /* 【新增】翻开的书本及过渡文字大遮罩层 */
+        .open-book-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .open-book-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .open-book-container {
+            position: relative;
+            width: 60vw; /* 占据屏幕一半左右的大小 */
+            max-width: 800px;
+            aspect-ratio: 4 / 3;
+            background-image: url('./images/open_book.png'); /* 请确保放置一张翻开的书的图片，下方附带防错兜底 */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10%;
+        }
+        .open-book-text {
+            font-family: 'Noto Serif SC', 'Cambria', serif;
+            font-size: 1.45rem;
+            line-height: 1.8;
+            color: #2c1a0c; /* 书页暗色文字 */
+            text-align: justify;
+            opacity: 0;
+            transition: opacity 1s ease;
+            text-shadow: none;
+            font-weight: 600;
+            max-width: 85%;
+        }
+        .open-book-text.fade-in {
+            opacity: 1;
+        }
+
         /* explore entrance (phase two) */
         .explore-icon {
             display: none; 
@@ -260,33 +306,33 @@
             display: none !important;
         }
 
-        /* 左下角视图布局 */
+        /* 【核心修改】大幅增大了左下角视图布局（变成原本的 2.5 倍大小） */
         .second-view {
             position: fixed;
-            left: 30px;
-            bottom: 70px; /* 留出底部 footer 的空间 */
+            left: 40px;
+            bottom: 80px; 
             z-index: 10;
-            max-width: 420px;
-            width: calc(100% - 60px);
+            max-width: 750px; /* 从 420px 扩大 */
+            width: calc(100% - 80px);
         }
 
         .character-chat {
             display: flex;
-            flex-direction: row; /* 横向排列：Guomo在左，对话框在右 */
-            align-items: flex-end; /* 对齐底部 */
-            gap: 15px;
+            flex-direction: row; 
+            align-items: flex-end; 
+            gap: 25px; /* 增大间距 */
         }
 
         .guomo-character {
-            width: 75px; 
+            width: 180px;  /* 从 75px 扩大至 2.4 倍 */
             height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.28));
+            filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.4));
             pointer-events: none;
             flex-shrink: 0;
         }
 
-        /* 对话面板 */
+        /* 对话面板大尺寸化 */
         .ai-chat {
             flex: 1;
             color: #4b1f2d;
@@ -294,46 +340,47 @@
         }
 
         .ai-chat-panel {
-            background: rgba(255, 250, 252, 0.94);
-            border: 1px solid rgba(190, 130, 145, 0.36);
-            border-radius: 18px;
-            box-shadow: 0 14px 32px rgba(18, 12, 22, 0.18);
-            backdrop-filter: blur(10px);
-            padding: 12px;
+            background: rgba(255, 250, 252, 0.96);
+            border: 1.5px solid rgba(190, 130, 145, 0.45);
+            border-radius: 24px; /* 稍加圆润 */
+            box-shadow: 0 18px 45px rgba(18, 12, 22, 0.25);
+            backdrop-filter: blur(12px);
+            padding: 22px; /* 扩大内边距 */
         }
 
         .ai-chat-messages {
-            min-height: 70px;
-            max-height: 140px;
+            min-height: 140px; /* 高度翻倍 */
+            max-height: 260px;
             overflow-y: auto;
-            padding: 6px;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            padding: 8px;
+            font-size: 1.15rem; /* 字号增大 */
+            line-height: 1.6;
             text-align: left;
         }
 
         .ai-chat-message {
-            margin-bottom: 6px;
+            margin-bottom: 12px;
         }
 
         .ai-chat-message strong {
             color: #b83256;
+            font-size: 1.2rem;
         }
 
         .ai-chat-form {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 14px;
         }
 
         .ai-chat-input {
             flex: 1;
             min-width: 0;
-            border: 1px solid rgba(184, 50, 86, 0.26);
+            border: 1.5px solid rgba(184, 50, 86, 0.35);
             border-radius: 999px;
-            padding: 6px 12px;
+            padding: 10px 20px; /* 增大输入框手感 */
             font: inherit;
-            font-size: 0.88rem;
+            font-size: 1.05rem;
             color: #4b1f2d;
             outline: none;
             background: rgba(255, 255, 255, 0.9);
@@ -341,12 +388,12 @@
 
         .ai-chat-input:focus {
             border-color: #ff7894;
-            box-shadow: 0 0 0 3px rgba(255, 120, 148, 0.18);
+            box-shadow: 0 0 0 4px rgba(255, 120, 148, 0.25);
         }
 
         .ai-chat-button {
-            width: 32px;
-            height: 32px;
+            width: 44px; /* 从 32px 扩大 */
+            height: 44px;
             border: 0;
             border-radius: 50%;
             background: #ff7894;
@@ -358,8 +405,13 @@
             flex-shrink: 0;
         }
 
+        .ai-chat-button svg {
+            width: 18px; /* 放大图标 */
+            height: 18px;
+        }
+
         .ai-chat-button:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
             background: #e85f7d;
         }
 
@@ -370,16 +422,17 @@
         }
 
         body.light-mode .ai-chat-panel {
-            background: rgba(255, 255, 255, 0.96);
-            border-color: rgba(180, 130, 140, 0.35);
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(180, 130, 140, 0.45);
         }
 
-        @media (max-width: 650px) {
-            .title { font-size: 2rem; }
-            .quote { font-size: 1.25rem; }
-            .quote-box { padding: 28px 20px; }
-            .book-img { max-width: 180px; }
+        @media (max-width: 768px) {
             .second-view { left: 15px; bottom: 65px; width: calc(100% - 30px); }
+            .guomo-character { width: 100px; }
+            .ai-chat-panel { padding: 12px; }
+            .ai-chat-messages { min-height: 90px; font-size: 0.95rem; }
+            .open-book-container { width: 90vw; padding: 15%; }
+            .open-book-text { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -408,7 +461,7 @@
                         <form class="ai-chat-form" id="chatForm">
                             <input class="ai-chat-input" id="userInput" type="text" placeholder="输入你的问题..." autocomplete="off">
                             <button class="ai-chat-button" id="sendButton" type="submit" aria-label="发送消息">
-                                <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M3.5 20.5 21 12 3.5 3.5 6 10.5 14 12 6 13.5z" fill="currentColor"/>
                                 </svg>
                             </button>
@@ -429,6 +482,14 @@
         <div class="explore-text" id="exploreText">Explore the Library</div>
     </div>
 
+    <div class="open-book-overlay" id="openBookOverlay">
+        <div class="open-book-container" id="openBookContainer">
+            <div class="open-book-text" id="openBookText">
+                中国科学技术大学东校区，有着知识洋溢的图书馆，有着充满欢笑和回忆的郭沫若广场，有着天才的学院，有着静谧的咖啡馆，还有着粉红色的樱花大道，到处充满着浪漫的气息。
+            </div>
+        </div>
+    </div>
+
     <div class="footer">
         <p>© 3099 · Library of Recollection</p>
     </div>
@@ -445,6 +506,11 @@
         const exploreIcon = document.getElementById('exploreIcon');
         const exploreText = document.getElementById('exploreText');
         const bodyEl = document.body;
+
+        // 获取新增的过渡元素
+        const openBookOverlay = document.getElementById('openBookOverlay');
+        const openBookContainer = document.getElementById('openBookContainer');
+        const openBookText = document.getElementById('openBookText');
 
         const phase0Text = `I've come to the library of USTC, which in my memory holds all knowledge, but it looks so dilapidated now.\nHey, there's a book on the floor. Let me pick it up and see.`;
         const phase1Text = `What was that book? It's gone. This library feels different now.`;
@@ -496,31 +562,56 @@
             typeChar();
         }
 
-        // ---------- 点击书本后触发进入第二阶段 ----------
-        function enterBrightLibrary() {
-            if (phaseTransitionLock) return;
-            if (currentPhase === 1) return;
-            
+        // ---------- 点击旧书后触发新的中间过渡剧情 ----------
+        function onBookClickHandler(event) {
+            if (currentPhase !== 0 || phaseTransitionLock) return;
             phaseTransitionLock = true;
-            currentPhase = 1;
-            
-            // 1. 隐藏旧书
+
+            // 1. 隐藏地上的旧书
             if (bookContainer) {
                 bookContainer.style.setProperty('display', 'none', 'important');
             }
+
+            // 2. 展现翻开的书（淡入特效），此时背景依然维持 filter: brightness(0.4) 较暗状态
+            openBookOverlay.classList.add('active');
+
+            // 3. 稍做延迟让书本展开后，再使文字平滑浮现 (fade-in)
+            setTimeout(() => {
+                openBookText.classList.add('fade-in');
+                
+                // 4. 文字停留展示 4.5 秒后，自动执行隐去与进入光亮图书馆阶段
+                setTimeout(() => {
+                    // 文字与翻开的书执行“隐去”特效
+                    openBookText.classList.remove('fade-in');
+                    openBookOverlay.classList.remove('active');
+
+                    // 5. 待隐去动画彻底结束后 (800ms)，正式解锁并渲染 Guomo 视角
+                    setTimeout(() => {
+                        enterBrightLibrary();
+                    }, 800);
+
+                }, 4500); 
+
+            }, 400);
+        }
+
+        // ---------- 最终阶段：进入明亮的图书馆 ----------
+        function enterBrightLibrary() {
+            currentPhase = 1;
             
-            // 2. 显示左下角的 Guomo 和对话框
+            // 显示左下角放大的 Guomo 形象和宽敞的聊天面板
             if (secondView) {
                 secondView.classList.remove('hidden');
             }
             
-            // 3. 切换亮色模式（触发 CSS 里的 brightness 提升）
+            // 切换亮色模式（触发 CSS 里的背景 brightness 提升至 0.95）
             bodyEl.classList.add('light-mode');
             
             resetAndClearText();
             
             typeTextToElement(phase1Text, () => {
                 showExploreEntrance();
+                phaseTransitionLock = false; // 整个流程顺利完毕，解锁
             }, true);
         }
         
@@ -560,17 +651,14 @@
             if (secondView) {
                 secondView.classList.add('hidden');
             }
+
+            if (openBookOverlay) openBookOverlay.classList.remove('active');
+            if (openBookText) openBookText.classList.remove('fade-in');
             
             resetAndClearText();
             typeTextToElement(phase0Text, () => {
                 if (monologueEl) monologueEl.classList.remove('cursor');
             }, true);
-        }
-        
-        function onBookClickHandler(event) {
-            if (currentPhase !== 0) return;
-            if (phaseTransitionLock) return;
-            enterBrightLibrary();
         }
         
         function createParticles() {
@@ -600,6 +688,19 @@
                 if (!bookImg.src.includes('data:image/svg')) {
                     bookImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%238B5A2B'/%3E%3Cpath fill='%23EBC485' d='M30,25 L70,25 L70,75 L30,75 Z'/%3E%3Cline x1='45' y1='35' x2='65' y2='35' stroke='%23443322' stroke-width='3'/%3E%3Cline x1='45' y1='47' x2='60' y2='47' stroke='%23443322' stroke-width='3'/%3E%3Ccircle cx='45' cy='62' r='5' fill='%23DDAA66'/%3E%3C/svg%3E";
                 }
+            }
+
+            // 对中间翻开的书进行SVG兜底渲染，防止本地没有open_book.png时界面空白
+            if (openBookContainer) {
+                const img = new Image();
+                img.src = './images/open_book.png';
+                img.onerror = () => {
+                    openBookContainer.style.backgroundImage = "none";
+                    openBookContainer.style.background = "rgba(247, 243, 222, 0.95)";
+                    openBookContainer.style.border = "2px solid #c8a070";
+                    openBookContainer.style.borderRadius = "20px";
+                    openBookContainer.style.boxShadow = "0 20px 50px rgba(0,0,0,0.6)";
+                };
             }
         }
 
